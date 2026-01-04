@@ -8,18 +8,22 @@ const PORT = process.env.PORT || 8000;
 const DB_FILE = path.join(__dirname, 'db.json');
 
 // --- DATABASE MODE DETECTION ---
-// Fallback to hardcoded URI for persistence if env variable is missing
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://abrar2211c_db_user:Wellcom3@cluster0.jjztyoi.mongodb.net/wifi_db?retryWrites=true&w=majority";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://abrar2211c_db_user:Wellcom3@cluster0.jjztyoi.mongodb.net/?retryWrites=true&w=majority";
 let IS_MONGO_MODE = false;
 
 if (MONGODB_URI) {
-    mongoose.connect(MONGODB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+    console.log('📡 Attempting to connect to MongoDB...');
+    mongoose.connect(MONGODB_URI)
         .then(() => {
             console.log('✅ Connected to MongoDB Atlas (Live Database)');
             IS_MONGO_MODE = true;
             seedAdminMongo();
         })
-        .catch(err => console.error('❌ MongoDB Error:', err));
+        .catch(err => {
+            console.error('❌ MongoDB Connection Error:', err.message);
+            console.log('📂 Falling back to LOCAL FILE MODE due to connection error');
+            initializeLocalFile();
+        });
 } else {
     console.log('📂 No MongoDB URI found. Running in LOCAL FILE MODE (db.json)');
     console.warn('⚠️ WARNING: Data will NOT persist on Render.com in Local Mode! Please set MONGODB_URI in Environment Variables.');
