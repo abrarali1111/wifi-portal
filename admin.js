@@ -444,8 +444,6 @@ function updateBillingSummary(users) {
     let totalRemainingBalance = 0;
 
     users.forEach(u => {
-        // Assuming role 2 is for customers, if needed we can filter by role
-        // For now, let's sum everyone's billing fields
         const fee = parseFloat(u.monthlyFee) || 0;
         const balance = parseFloat(u.balance) || 0;
 
@@ -453,11 +451,16 @@ function updateBillingSummary(users) {
         totalRemainingBalance += balance;
     });
 
+    // Calculate total collected from payments record
+    const totalCollected = (window.allPayments || []).reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+
     const feeEl = document.getElementById('totalMonthlyFee');
     const balanceEl = document.getElementById('totalRemainingBalance');
+    const collectedEl = document.getElementById('totalCollectedAmount');
 
     if (feeEl) feeEl.innerText = `Rs. ${totalMonthlyFee.toLocaleString()}`;
     if (balanceEl) balanceEl.innerText = `Rs. ${totalRemainingBalance.toLocaleString()}`;
+    if (collectedEl) collectedEl.innerText = `Rs. ${totalCollected.toLocaleString()}`;
 }
 
 window.deleteUser = async function (uid) {
