@@ -60,6 +60,14 @@ async function loadServerData() {
                 dbStatusEl.style.color = "white";
             } else {
                 dbStatusEl.innerText = "⚠️ Temporary Mode (Local)";
+                if (data.cloudError) {
+                    console.error("Cloud Error:", data.cloudError);
+                    dbStatusEl.title = "Error: " + data.cloudError;
+                    // If it contains 'IP' it's likely a whitelisting issue
+                    if (data.cloudError.includes("IP")) {
+                        dbStatusEl.innerText += " (IP Blocked)";
+                    }
+                }
                 dbStatusEl.style.backgroundColor = "#b45309";
                 dbStatusEl.style.color = "white";
             }

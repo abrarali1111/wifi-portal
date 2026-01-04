@@ -10,6 +10,7 @@ const DB_FILE = path.join(__dirname, 'db.json');
 // --- DATABASE MODE DETECTION ---
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://abrar2211c_db_user:Wellcom3@cluster0.jjztyoi.mongodb.net/wifi_db?retryWrites=true&w=majority";
 let IS_MONGO_MODE = false;
+let cloudError = null;
 
 if (MONGODB_URI) {
     console.log('📡 Attempting to connect to MongoDB...');
@@ -23,10 +24,12 @@ if (MONGODB_URI) {
         .then(() => {
             console.log('✅ Connected to MongoDB Atlas (Live Database)');
             IS_MONGO_MODE = true;
+            cloudError = null;
             seedAdminMongo();
         })
         .catch(err => {
             console.error('❌ MongoDB Connection Error:', err.message);
+            cloudError = err.message;
             console.log('📂 Falling back to LOCAL FILE MODE due to connection error');
             initializeLocalFile();
         });
@@ -176,7 +179,7 @@ const server = http.createServer(async (req, res) => {
             if (route === '/api/data' && req.method === 'GET') {
                 const data = await getAllData();
                 res.writeHead(200, { 'Content-Type': 'application/json' });
-                res.end(JSON.stringify({ ...data, isCloud: IS_MONGO_MODE }));
+                res.end(JSON.stringify({ ...data, isCloud: IS_MONGO_MODE, cloudError: cloudError }));
                 return;
             }
 
