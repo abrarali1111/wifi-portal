@@ -1,0 +1,25 @@
+HOW TO USE THIS ON WIFI (LOCAL NETWORK)
+
+If you want people connected to your WiFi to access this page locally:
+
+1. INSTALL NODE.JS
+   - Make sure Node.js is installed on your computer.
+
+2. OPEN TERMINAL / COMMAND PROMPT
+   - Go to this folder.
+   - Run: node server.js
+   (This starts the backend server)
+
+3. FIND YOUR COMPUTER'S IP ADDRESS
+   - Windows: Open cmd -> type 'ipconfig' -> Look for 'IPv4 Address'
+   - Example IP: 192.168.1.15
+
+4. SHARE THE LINK
+   - The link will be: http://<YOUR_IP>:8000
+   - Example: http://192.168.1.15:8000
+
+5. CONNECT
+   - Anyone connected to the SAME WiFi as you can open that link on their phone or laptop.
+   - They can register, login, and submit data.
+
+NOTE: This system uses a local server (server.js) and saves data to db.json.

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Users List - WiFi System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container admin-container">
+        <div class="dashboard-header">
+            <h2>All Users Detailed List</h2>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button id="backBtn" class="btn-primary"
+                    style="width: auto; padding: 10px; background-color: #4b5563;">Back to Admin</button>
+                <button id="downloadExcelBtn" class="btn-primary"
+                    style="width: auto; padding: 10px; background-color: #059669;">Download Excel (CSV)</button>
+            </div>
+        </div>
+
+        <div class="search-container">
+            <input type="text" id="listSearchInput" class="search-input"
+                placeholder="Quick filter by name, phone or CNIC...">
+        </div>
+
+        <div class="excel-table-container">
+            <table class="excel-table" id="usersTable">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Phone</th>
+                        <th>CNIC</th>
+                        <th>Email</th>
+                        <th>Package</th>
+                        <th>Monthly Fee</th>
+                        <th>Balance</th>
+                        <th>Address</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr>
+                        <td colspan="9" style="text-align:center;">Loading users...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="module" src="user_list.js"></script>
+    <script>
+        // Security Check
+        const u = localStorage.getItem("wifi_user");
+        if (!u) {
+            window.location.href = "index.html";
+        } else {
+            const user = JSON.parse(u);
+            if (user.role !== 'admin') {
+                alert("Access Denied. Admins only.");
+                window.location.href = "dashboard.html";
+            }
+        }
+        document.getElementById('backBtn').onclick = () => window.location.href = "admin.html";
+    </script>
+</body>
+
+</html>

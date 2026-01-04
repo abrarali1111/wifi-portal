@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - WiFi System</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container admin-container">
+        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
+            <button id="logoutBtn" class="btn-primary"
+                style="width: auto; padding: 8px 15px; background-color: #dc2626; font-size: 0.9rem;">Logout</button>
+        </div>
+        <div class="dashboard-header">
+            <div style="display: flex; flex-direction: column; align-items: flex-start;">
+                <h2 style="margin: 0;">RAJA SAB - Admin Dashboard</h2>
+                <p id="adminWelcomeName"
+                    style="color: var(--primary-color); font-weight: 600; font-size: 0.95rem; margin-top: 5px;">Welcome,
+                    Admin</p>
+            </div>
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="showSection('complaints')" class="btn-primary"
+                    style="width: auto; padding: 10px;">Complaints</button>
+                <button onclick="showSection('users')" class="btn-primary"
+                    style="width: auto; padding: 10px; background-color: #4b5563;">Users List</button>
+                <button onclick="showSection('reports')" class="btn-primary"
+                    style="width: auto; padding: 10px; background-color: #2563eb;">Monthly Reports</button>
+                <button id="addUserBtn" class="btn-primary"
+                    style="width: auto; padding: 10px; background-color: #059669;">+ Add User</button>
+                <button id="downloadExcelBtn" class="btn-primary"
+                    style="width: auto; padding: 10px; background-color: #d97706; border: 1px solid #b45309;">📥
+                    Download Excel</button>
+
+            </div>
+        </div>
+
+        <!-- Billing Summary Section -->
+        <div class="billing-summary-container">
+            <div class="billing-card">
+                <h4>Total Monthly Fee</h4>
+                <div class="amount" id="totalMonthlyFee">Rs. 0</div>
+            </div>
+            <div class="billing-card balance">
+                <h4>Total Remaining Balance</h4>
+                <div class="amount" id="totalRemainingBalance">Rs. 0</div>
+            </div>
+        </div>
+
+
+
+        <!-- Section: Complaints -->
+        <div id="complaintsSection">
+            <h3>Recent Complaints</h3>
+            <div id="complaintsList">
+                <p style="text-align: center; color: var(--text-light);">Loading complaints...</p>
+            </div>
+        </div>
+
+        <!-- Section: Users -->
+        <div id="usersSection" style="display: none;">
+            <!-- Administrators List -->
+            <div style="margin-bottom: 40px;">
+                <h3>Administrators</h3>
+                <div class="excel-table-container">
+                    <table class="excel-table" id="adminsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>CNIC</th>
+                                <th>Address</th>
+                                <th>Role</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminAdminsTableBody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-light);">Loading
+                                    administrators...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Customer Users List -->
+            <div>
+                <h3>Customer Users</h3>
+                <div class="search-container">
+                    <input type="text" id="userSearchInput" class="search-input"
+                        placeholder="Search customer by name or phone...">
+                </div>
+                <div class="excel-table-container">
+                    <table class="excel-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>CNIC</th>
+                                <th>Address</th>
+                                <th>Months</th>
+                                <th>Fee</th>
+                                <th>Balance</th>
+                                <th>Start</th>
+                                <th>End</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminUsersTableBody">
+                            <tr>
+                                <td colspan="11" style="text-align: center; color: var(--text-light);">Loading
+                                    customers...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: Reports -->
+        <div id="reportsSection" style="display: none;">
+            <h3>Monthly Billing Reports</h3>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; background: var(--card-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border-color);">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <label style="margin: 0; font-weight: 500;">View:</label>
+                    <select id="reportFilter"
+                        style="padding: 8px; border-radius: 6px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color);">
+                        <option value="current">Current Month Only</option>
+                        <option value="all" selected>Custom / Full History (Add/Delete)</option>
+                    </select>
+                </div>
+                <button id="downloadReportBtn" class="btn-primary"
+                    style="width: auto; padding: 8px 15px; background-color: #2563eb; font-size: 0.9rem;">
+                    📥 Download Report
+                </button>
+            </div>
+
+
+
+            <div class="excel-table-container">
+                <table class="excel-table" id="reportsTable">
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Projected Income (Total Fees)</th>
+                            <th>Collected Amount</th>
+                            <th>Remaining (Pending)</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminReportsTableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Add Month Container (Moved Here) -->
+            <div id="addMonthContainer"
+                style="display: none; margin-top: 15px; margin-bottom: 15px; background: var(--card-bg); padding: 15px; border-radius: 10px; border: 1px solid var(--border-color); align-items: flex-end; gap: 10px;">
+                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <label style="margin-bottom: 5px;">Month</label>
+                    <select id="newReportMonth" style="padding: 10px;">
+                        <option value="Jan">January</option>
+                        <option value="Feb">February</option>
+                        <option value="Mar">March</option>
+                        <option value="Apr">April</option>
+                        <option value="May">May</option>
+                        <option value="Jun">June</option>
+                        <option value="Jul">July</option>
+                        <option value="Aug">August</option>
+                        <option value="Sep">September</option>
+                        <option value="Oct">October</option>
+                        <option value="Nov">November</option>
+                        <option value="Dec">December</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0; flex: 1;">
+                    <label style="margin-bottom: 5px;">Year</label>
+                    <input type="number" id="newReportYear" placeholder="2026" style="padding: 10px;">
+                </div>
+                <button id="addMonthBtn" class="btn-primary" style="width: auto; background-color: #059669;">+ Add
+                    Month</button>
+            </div>
+
+            <div style="margin-top: 30px;">
+                <button onclick="document.getElementById('paymentModal').style.display='block'" class="btn-primary"
+                    style="width: auto;">+ RECORD NEW PAYMENT</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- The Modal: Add User -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeAddModal">&times;</span>
+            <div class="modal-header">
+                <h2>Add New User</h2>
+            </div>
+            <form id="adminAddUserForm">
+                <div class="form-group">
+                    <label>User ID (Manual)</label>
+                    <input type="text" id="adminCustomId" placeholder="e.g. 101, A-1">
+                </div>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="adminName" required>
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    <input type="tel" id="adminPhone" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="text" id="adminPassword" placeholder="Default: 123">
+                </div>
+                <div class="form-group">
+                    <label>CNIC Number</label>
+                    <input type="text" id="adminCnic" placeholder="35201-1234567-1" required>
+                </div>
+                <div class="form-group">
+                    <label>Full Address</label>
+                    <input type="text" id="adminAddress" placeholder="House #, Street, Area" required>
+                </div>
+                <div class="form-group">
+                    <label>Email (Optional)</label>
+                    <input type="email" id="adminEmail">
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="adminRole">
+                        <option value="2">User</option>
+                        <option value="1">Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Note / Remarks</label>
+                    <textarea id="adminNote" style="min-height: 80px;"></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Save User</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- The Modal: Edit User Details -->
+    <div id="editUserModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeEditModal">&times;</span>
+            <div class="modal-header">
+                <h2>Edit User Subscription</h2>
+            </div>
+            <form id="adminEditUserForm">
+                <input type="hidden" id="editUserId"> <!-- To track which user we are editing -->
+
+                <div class="form-group">
+                    <label>User ID (Manual)</label>
+                    <input type="text" id="editCustomId" placeholder="e.g. 101">
+                </div>
+
+                <div class="form-group">
+                    <label>Duration (Months)</label>
+                    <input type="number" id="editPackage" placeholder="E.g. 1, 3, 12" min="1">
+                </div>
+
+                <div class="profile-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Monthly Fee</label>
+                        <input type="number" id="editFee" placeholder="2000">
+                    </div>
+                    <div class="form-group">
+                        <label>Balance (Remaining)</label>
+                        <input type="number" id="editBalance" placeholder="500">
+                    </div>
+                </div>
+
+                <div class="profile-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="form-group">
+                        <label>Start Date</label>
+                        <input type="date" id="editStart">
+                    </div>
+                    <div class="form-group">
+                        <label>End Date</label>
+                        <input type="date" id="editEnd">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Address (Edit if needed)</label>
+                    <input type="text" id="editAddress">
+                </div>
+
+                <div class="form-group">
+                    <label>CNIC (Edit if needed)</label>
+                    <input type="text" id="editCnic">
+                </div>
+
+                <button type="submit" class="btn-primary">Update Details</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- The Modal: Reply to Complaint -->
+    <div id="replyModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closeReplyModal">&times;</span>
+            <div class="modal-header">
+                <h2>Reply to Complaint</h2>
+            </div>
+            <form id="adminReplyForm">
+                <input type="hidden" id="replyComplaintId">
+                <div class="form-group">
+                    <label>User's Message</label>
+                    <p id="userMessagePreview"
+                        style="font-style: italic; color: var(--text-light); background: var(--input-bg); padding: 10px; border-radius: 5px; font-size: 0.9rem; border: 1px solid var(--border-color);">
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label>Your Reply</label>
+                    <textarea id="adminReplyText" required placeholder="Type your response here..."></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Send Reply</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- The Modal: Record Payment -->
+    <div id="paymentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="document.getElementById('paymentModal').style.display='none'">&times;</span>
+            <div class="modal-header">
+                <h2>Record User Payment</h2>
+            </div>
+            <form id="recordPaymentForm">
+                <div class="form-group">
+                    <label>Select User</label>
+                    <select id="payUserId" required>
+                        <option value="">Select a user...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Amount (PKR)</label>
+                    <input type="number" id="payAmount" required placeholder="E.g. 1500">
+                </div>
+                <div class="form-group">
+                    <label>Billing Month</label>
+                    <select id="payMonth" required>
+                        <option value="Jan">January</option>
+                        <option value="Feb">February</option>
+                        <option value="Mar">March</option>
+                        <option value="Apr">April</option>
+                        <option value="May">May</option>
+                        <option value="Jun">June</option>
+                        <option value="Jul">July</option>
+                        <option value="Aug">August</option>
+                        <option value="Sep">September</option>
+                        <option value="Oct">October</option>
+                        <option value="Nov">November</option>
+                        <option value="Dec">December</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn-primary">Record Payment</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="admin.js"></script>
+    <script type="module" src="auth.js"></script>
+
+</body>
+
+</html>

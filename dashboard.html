@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Dashboard - WiFi Portal</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logout-link {
+            color: #ef4444;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container admin-container"> <!-- Using wider container -->
+
+        <div class="dashboard-header">
+            <h2 id="welcomeMsg">Welcome to RAJA SAB WiFi</h2>
+            <a id="logoutBtn" class="logout-link">Logout</a>
+        </div>
+
+        <!-- Profile Section -->
+        <div class="profile-card">
+            <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--primary-color);">My Profile</h3>
+            <p><strong>User ID:</strong> <span id="userCustomId"
+                    style="font-weight: bold; color: var(--primary-color);">...</span></p>
+            <p><strong>Name:</strong> <span id="userName">...</span></p>
+            <p><strong>CNIC:</strong> <span id="userCnic">...</span></p>
+            <p><strong>Phone:</strong> <span id="userPhone">...</span></p>
+            <p><strong>Email:</strong> <span id="userEmail">...</span></p>
+            <p><strong>Address:</strong> <span id="userAddress">...</span></p>
+
+        </div>
+
+        <!-- Subscription Details Section -->
+        <div class="profile-card" style="border-left: 4px solid var(--primary-color);">
+            <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--primary-color);">Subscription Details</h3>
+            <div class="profile-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <p><strong>Months:</strong> <span id="subPackage">Loading...</span></p>
+                <p><strong>Monthly Fee:</strong> <span id="subFee">Loading...</span></p>
+                <p><strong>Start Date:</strong> <span id="subStart">Loading...</span></p>
+                <p><strong>Next Due:</strong> <span id="subEnd">Loading...</span></p>
+            </div>
+            <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color);">
+            <p style="font-size: 1.1rem;"><strong>Remaining Balance:</strong> <span id="subBalance"
+                    style="color: #ef4444; font-weight: bold;">Loading...</span></p>
+        </div>
+
+        <!-- Complaints Section -->
+        <div class="section-header" style="flex-wrap: wrap; gap: 10px;">
+            <h3>My Complaints / Messages</h3>
+            <button id="newComplaintBtn" class="btn-primary"
+                style="background-color: #059669; width: auto; padding: 12px 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+                + SUBMIT NEW COMPLAINT
+            </button>
+        </div>
+
+        <div id="myComplaintsList">
+            <p style="text-align: center; color: var(--text-light);">Loading your history...</p>
+        </div>
+    </div>
+
+    <!-- New Complaint Modal -->
+    <div id="complaintModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-header">
+                <h2>Submit New Message</h2>
+            </div>
+            <form id="newConversationForm">
+                <div class="form-group">
+                    <label>Complaint Type</label>
+                    <select id="complaintType">
+                        <option value="Slow Speed">Slow Internet Speed</option>
+                        <option value="No Signal">No Signal / Disconnected</option>
+                        <option value="Billing Issue">Billing / Payment Issue</option>
+                        <option value="Device Issue">Router / Device Issue</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message / Detail</label>
+                    <textarea id="newMessageBody" required></textarea>
+                </div>
+                <button type="submit" class="btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <script type="module" src="auth.js"></script>
+    <script type="module" src="dashboard.js"></script>
+</body>
+
+</html>

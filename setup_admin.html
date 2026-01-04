@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Setup Admin User</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>Create ADMIN Account</h1>
+            <p style="color: #ef4444; font-weight: 500;">Use this only to create the main owner account.</p>
+        </header>
+
+        <form id="adminForm">
+            <div class="form-group">
+                <label>Admin Name</label>
+                <input type="text" id="aName" placeholder="Raja Sab" required>
+            </div>
+            <div class="form-group">
+                <label>Phone (Login ID)</label>
+                <input type="tel" id="aPhone" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="text" id="aPass" required>
+            </div>
+            <button type="submit" class="btn-primary" style="background-color: #dc2626;">Create Admin</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { db } from "./firebase-config.js";
+        import { collection, addDoc, query, where, getDocs } from "./mock-firebase.js";
+
+        document.getElementById('adminForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = e.target.querySelector('button');
+            btn.innerText = "Creating...";
+
+            const phone = document.getElementById('aPhone').value;
+
+            // Check duplicate
+            const q = query(collection(db, "users"), where("phone", "==", phone));
+            const snap = await getDocs(q);
+            if (!snap.empty) {
+                alert("User with this phone already exists!");
+                btn.innerText = "Create Admin";
+                return;
+            }
+
+            await addDoc(collection(db, "users"), {
+                name: document.getElementById('aName').value,
+                phone: phone,
+                password: document.getElementById('aPass').value,
+                role: 1, // Admin role is 1
+                createdAt: new Date(),
+                package: "Owner",
+                balance: "0"
+            });
+
+            alert("Admin Created! Now go to index.html and Login.");
+            window.location.href = "index.html";
+        });
+    </script>
+</body>
+
+</html>

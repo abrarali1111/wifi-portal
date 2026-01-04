@@ -1,0 +1,19 @@
+{
+    "name": "wifi-portal",
+    "version": "1.0.0",
+    "description": "WiFi Complaint and Management System",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "mongoose": "^9.1.1"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    }
+}
