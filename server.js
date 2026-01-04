@@ -275,12 +275,33 @@ const server = http.createServer(async (req, res) => {
                 req.on('end', async () => {
                     const pData = JSON.parse(body);
                     pData.id = "pay_" + Date.now();
-                    if (IS_MONGO_MODE) await Payment.create(pData);
-                    else {
+                    pData.timestamp = new Date().toISOString();
+
+                    if (IS_MONGO_MODE) {
+                        await Payment.create(pData);
+                        // Update User Balance automatically
+                        const user = await User.findOne({ id: pData.userId });
+                        if (!user && mongoose.Types.ObjectId.isValid(pData.userId)) {
+                            const u2 = await User.findById(pData.userId);
+                            if (u2) {
+                                u2.balance = (parseFloat(u2.balance) - parseFloat(pData.amount)).toString();
+                                await u2.save();
+                            }
+                        } else if (user) {
+                            user.balance = (parseFloat(user.balance) - parseFloat(pData.amount)).toString();
+                            await user.save();
+                        }
+                    } else {
                         const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
                         if (!data.payments) data.payments = [];
-                        pData.timestamp = new Date().toISOString();
                         data.payments.push(pData);
+
+                        // Update User Balance in Local File
+                        const uIdx = data.users.findIndex(u => u.id === pData.userId);
+                        if (uIdx !== -1) {
+                            const newBal = (parseFloat(data.users[uIdx].balance || 0) - parseFloat(pData.amount)).toString();
+                            data.users[uIdx].balance = newBal;
+                        }
                         fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
                     }
                     res.writeHead(201); res.end(JSON.stringify({ success: true }));

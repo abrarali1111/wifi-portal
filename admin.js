@@ -652,9 +652,9 @@ function renderReports() {
 
         row.innerHTML = `
             <td><strong>${monthYear}</strong></td>
-            <td>Rs. ${projectedMonthly.toLocaleString()}</td>
-            <td style="color: green; font-weight: bold;">Rs. ${collected.toLocaleString()}</td>
-            <td style="color: ${pending > 0 ? 'red' : 'gray'};">Rs. ${pending.toLocaleString()}</td>
+            <td style="font-weight: 600;">Rs. ${projectedMonthly.toLocaleString()}</td>
+            <td style="color: var(--accent-color); font-weight: bold;">Rs. ${collected.toLocaleString()}</td>
+            <td style="color: ${pending > 0 ? 'var(--danger-color)' : 'var(--text-light)'}; font-weight: bold;">Rs. ${pending.toLocaleString()}</td>
             <td style="text-align: center;">${actionHtml}</td>
         `;
         tbody.appendChild(row);
