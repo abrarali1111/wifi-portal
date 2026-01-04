@@ -44,12 +44,28 @@ const Payment = mongoose.models.Payment || mongoose.model('Payment', paymentSche
 
 // --- LOCAL FILE INIT ---
 function initializeLocalFile() {
+    const phone = "03243475400";
     if (!fs.existsSync(DB_FILE)) {
         const initialData = {
-            users: [{ id: "admin_seed", name: "abrar ali", phone: "03243475400", password: "Wellcom3", role: 1, package: "Owner", balance: "0" }],
+            users: [{ id: "admin_seed", name: "abrar ali", phone: phone, password: "Wellcom3", role: 1, package: "Owner", balance: "0" }],
             complaints: [], payments: []
         };
         fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
+        console.log("📂 Local Database Created with Admin");
+    } else {
+        const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+        let admin = data.users.find(u => u.phone === phone);
+        if (admin) {
+            admin.name = "abrar ali";
+            admin.password = "Wellcom3";
+            admin.role = 1;
+            fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+            console.log("✅ Local Admin Credentials Updated");
+        } else {
+            data.users.push({ id: "admin_seed", name: "abrar ali", phone: phone, password: "Wellcom3", role: 1, package: "Owner", balance: "0" });
+            fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+            console.log("👑 Local Admin Added");
+        }
     }
 }
 
