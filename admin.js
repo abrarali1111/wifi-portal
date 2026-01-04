@@ -45,6 +45,12 @@ async function loadServerData() {
         // Update billing summary
         updateBillingSummary(data.users || []);
 
+        // Refresh reports if visible
+        const reportsSec = document.getElementById('reportsSection');
+        if (reportsSec && reportsSec.style.display === 'block') {
+            renderReports();
+        }
+
         // Populate User Select in Payment Modal
         populatePaymentUserSelect(data.users || []);
     } catch (e) {
