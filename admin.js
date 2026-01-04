@@ -633,14 +633,29 @@ function renderReports() {
         if (addMonthContainer) addMonthContainer.style.display = 'flex';
     }
 
+    // Calculate Total Real-time Pending Balance for synchronization
+    let totalRealtimePending = 0;
+    users.forEach(u => totalRealtimePending += (parseFloat(u.balance) || 0));
+
+    const currentMonthStr = months[new Date().getMonth()] + " " + currentYear;
+
     loopMonths.forEach(monthYear => {
-        // Filter payments for this specific month
-        const collected = payments
-            .filter(p => p.month === monthYear)
-            .reduce((sum, p) => sum + (p.amount || 0), 0);
+        let collected = 0;
+        let pending = 0;
+
+        if (monthYear === currentMonthStr) {
+            // SYNC WITH CARDS: Use current user balances for the current month row
+            pending = totalRealtimePending;
+            collected = Math.max(0, projectedMonthly - pending);
+        } else {
+            // HISTORY: Use payment records for past/other months
+            collected = payments
+                .filter(p => p.month === monthYear)
+                .reduce((sum, p) => sum + (p.amount || 0), 0);
+            pending = Math.max(0, projectedMonthly - collected);
+        }
 
         const row = document.createElement('tr');
-        const pending = projectedMonthly - collected;
 
         // Delete Button HTML (Only for Custom View)
         let actionHtml = '';
