@@ -39,11 +39,11 @@ async function loadServerData() {
         // Render table
         renderUsers(data.users || []);
 
-        // Update billing summary
-        updateBillingSummary(data.users || []);
-
         // Store payments if they exist
         window.allPayments = data.payments || [];
+
+        // Update billing summary
+        updateBillingSummary(data.users || []);
 
         // Populate User Select in Payment Modal
         populatePaymentUserSelect(data.users || []);
@@ -77,12 +77,10 @@ function renderComplaints(complaints) {
                 <p><strong>Type:</strong> ${data.type || 'General'}</p>
                 <p><strong>Msg:</strong> ${escapeHtml(data.message)}</p>
                 ${data.adminReply ? `
-                ${data.adminReply ? `
                 <div class="admin-reply-box">
                     <p style="margin:0; font-weight:600; font-size:0.85rem; color: #4caf50;">Your Reply:</p>
                     <p style="margin:5px 0 0 0; font-size:0.9rem;">${escapeHtml(data.adminReply)}</p>
                 </div>
-                ` : ''}
                 ` : ''}
                 <div style="margin-top:10px; font-size:0.85em; color:#666; display: flex; justify-content: space-between; align-items: flex-end;">
                     <span>Phone: ${escapeHtml(data.phone)} | Email: ${escapeHtml(data.email)}</span>
@@ -307,7 +305,7 @@ document.getElementById('adminEditUserForm').addEventListener('submit', async (e
                     endDate: document.getElementById('editEnd').value,
                     cnic: document.getElementById('editCnic').value,
                     customId: document.getElementById('editCustomId').value,
-                    address: document.getElementById('editAddress') ? document.getElementById('editAddress').value : user.address
+                    address: document.getElementById('editAddress') ? document.getElementById('editAddress').value : allUsers[uid].address
                 }
             })
         });
