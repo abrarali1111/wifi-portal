@@ -465,6 +465,12 @@ function updateBillingSummary(users) {
     // Calculate collected amount based on Monthly Fee vs Pending Balance
     const totalCollected = Math.max(0, totalMonthlyFee - totalRemainingBalance);
 
+    console.log("📊 Billing Summary Update:", {
+        totalMonthlyFee,
+        totalRemainingBalance,
+        totalCollected
+    });
+
     const feeEl = document.getElementById('totalMonthlyFee');
     const balanceEl = document.getElementById('totalRemainingBalance');
     const collectedEl = document.getElementById('totalCollectedAmount');
