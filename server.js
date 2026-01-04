@@ -46,7 +46,7 @@ const Payment = mongoose.models.Payment || mongoose.model('Payment', paymentSche
 function initializeLocalFile() {
     if (!fs.existsSync(DB_FILE)) {
         const initialData = {
-            users: [{ id: "admin_seed", name: "abrar", phone: "03243475400", password: "123", role: 1, package: "Owner", balance: "0" }],
+            users: [{ id: "admin_seed", name: "abrar ali", phone: "03243475400", password: "Wellcom3", role: 1, package: "Owner", balance: "0" }],
             complaints: [], payments: []
         };
         fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
@@ -317,10 +317,25 @@ const server = http.createServer(async (req, res) => {
 });
 
 async function seedAdminMongo() {
-    const admin = await User.findOne({ role: 1 });
-    if (!admin) {
+    const phone = "03243475400";
+    let admin = await User.findOne({ phone });
+
+    if (admin) {
+        // Update existing admin to ensure new password and name are set
+        admin.name = "abrar ali";
+        admin.password = "Wellcom3";
+        admin.role = 1;
+        await admin.save();
+        console.log("✅ Admin Credentials Updated");
+    } else {
         await User.create({
-            id: "admin_seed", name: "abrar", phone: "03243475400", password: "123", role: 1, package: "Owner", balance: "0"
+            id: "admin_seed",
+            name: "abrar ali",
+            phone: phone,
+            password: "Wellcom3",
+            role: 1,
+            package: "Owner",
+            balance: "0"
         });
         console.log("👑 MongoDB Admin Created");
     }
