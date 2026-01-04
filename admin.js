@@ -51,6 +51,20 @@ async function loadServerData() {
             renderReports();
         }
 
+        // Update DB Status Indicator
+        const dbStatusEl = document.getElementById('dbStatus');
+        if (dbStatusEl) {
+            if (data.isCloud) {
+                dbStatusEl.innerText = "☁️ Cloud Synced";
+                dbStatusEl.style.backgroundColor = "#059669";
+                dbStatusEl.style.color = "white";
+            } else {
+                dbStatusEl.innerText = "⚠️ Temporary Mode (Local)";
+                dbStatusEl.style.backgroundColor = "#b45309";
+                dbStatusEl.style.color = "white";
+            }
+        }
+
         // Populate User Select in Payment Modal
         populatePaymentUserSelect(data.users || []);
     } catch (e) {
