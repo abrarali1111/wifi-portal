@@ -150,44 +150,50 @@ loadServerData();
 setInterval(loadServerData, 5000); // Refresh every 5 seconds
 
 // Search Logic
-document.getElementById('userSearchInput').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase();
-    const filtered = Object.values(allUsers).filter(u => {
-        return (u.name?.toLowerCase().includes(term) || u.phone?.includes(term) || u.cnic?.includes(term));
+const userSearchInput = document.getElementById('userSearchInput');
+if (userSearchInput) {
+    userSearchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase();
+        const filtered = Object.values(allUsers).filter(u => {
+            return (u.name?.toLowerCase().includes(term) || u.phone?.includes(term) || u.cnic?.includes(term));
+        });
+        renderUsers(filtered);
     });
-    renderUsers(filtered);
-});
+}
 
 // CSV Download Logic
-document.getElementById('downloadExcelBtn').onclick = () => {
-    const users = Object.values(allUsers);
-    if (users.length === 0) {
-        alert("No data to download");
-        return;
-    }
+const downloadExcelBtn = document.getElementById('downloadExcelBtn');
+if (downloadExcelBtn) {
+    downloadExcelBtn.onclick = () => {
+        const users = Object.values(allUsers);
+        if (users.length === 0) {
+            alert("No data to download");
+            return;
+        }
 
-    const headers = ["Name", "Phone", "CNIC", "Address", "Email", "Package", "Monthly Fee", "Balance", "Start Date", "End Date"];
-    const rows = users.map(u => [
-        `"${u.name || ''}"`,
-        `"${u.phone || ''}"`,
-        `"${u.cnic || ''}"`,
-        `"${u.address || ''}"`,
-        `"${u.email || ''}"`,
-        `"${u.package || ''}"`,
-        `"${u.monthlyFee || ''}"`,
-        `"${u.balance || ''}"`,
-        `"${u.startDate || ''}"`,
-        `"${u.endDate || ''}"`
-    ]);
+        const headers = ["Name", "Phone", "CNIC", "Address", "Email", "Package", "Monthly Fee", "Balance", "Start Date", "End Date"];
+        const rows = users.map(u => [
+            `"${u.name || ''}"`,
+            `"${u.phone || ''}"`,
+            `"${u.cnic || ''}"`,
+            `"${u.address || ''}"`,
+            `"${u.email || ''}"`,
+            `"${u.package || ''}"`,
+            `"${u.monthlyFee || ''}"`,
+            `"${u.balance || ''}"`,
+            `"${u.startDate || ''}"`,
+            `"${u.endDate || ''}"`
+        ]);
 
-    let csvContent = "sep=,\n" + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `wifi_users_${new Date().toLocaleDateString()}.csv`;
-    link.click();
-};
+        let csvContent = "sep=,\n" + headers.join(",") + "\n" + rows.map(e => e.join(",")).join("\n");
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `wifi_users_${new Date().toLocaleDateString()}.csv`;
+        link.click();
+    };
+}
 
 // --- ADD USER MODAL LOGIC ---
 const addModal = document.getElementById("userModal");

@@ -39,39 +39,38 @@ function updateUI(user) {
     console.log("Updating UI with user:", user);
     if (!user) return;
 
-    const welcomeMsg = document.getElementById('welcomeMsg');
-    if (welcomeMsg) welcomeMsg.innerText = `Hello, ${user.name}`;
-    if (document.getElementById('userCustomId')) document.getElementById('userCustomId').innerText = user.customId || "Not Assigned";
-    document.getElementById('userName').innerText = user.name;
-    document.getElementById('userCnic').innerText = user.cnic || "Not Added";
-    document.getElementById('userPhone').innerText = user.phone;
-    document.getElementById('userEmail').innerText = user.email || "-";
-    document.getElementById('subPackage').innerText = user.package || "-";
-    document.getElementById('subFee').innerText = user.monthlyFee ? user.monthlyFee + " PKR" : "0";
-    document.getElementById('subStart').innerText = user.startDate || "-";
-    document.getElementById('subEnd').innerText = user.endDate || "-";
-    document.getElementById('subBalance').innerText = user.balance ? user.balance + " PKR" : "0";
-    document.getElementById('userAddress').innerText = user.address || "Not Added";
+    const setE = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+    };
+
+    setE('welcomeMsg', `Hello, ${user.name}`);
+    setE('userCustomId', user.customId || "Not Assigned");
+    setE('userName', user.name);
+    setE('userCnic', user.cnic || "Not Added");
+    setE('userPhone', user.phone);
+    setE('userEmail', user.email || "-");
+    setE('subPackage', user.package || "-");
+    setE('subFee', user.monthlyFee ? user.monthlyFee + " PKR" : "0");
+    setE('subStart', user.startDate || "-");
+    setE('subEnd', user.endDate || "-");
+    setE('subBalance', user.balance ? user.balance + " PKR" : "0");
+    setE('userAddress', user.address || "Not Added");
 
     // Date Logic: If startDate exists, calculate End Date as +1 Month
     if (user.startDate && user.startDate !== "-" && user.startDate !== "") {
         try {
             const start = new Date(user.startDate);
-            // Add 1 month
             start.setMonth(start.getMonth() + 1);
-            // Format YYYY-MM-DD
             const end = start.toISOString().split('T')[0];
-            document.getElementById('subEnd').innerText = end;
+            setE('subEnd', end);
         } catch (e) {
             console.error("Date calc error:", e);
-            document.getElementById('subEnd').innerText = user.endDate || "-";
+            setE('subEnd', user.endDate || "-");
         }
     } else {
-        document.getElementById('subEnd').innerText = user.endDate || "-";
+        setE('subEnd', user.endDate || "-");
     }
-
-    // Status Logic removed as per user request
-
 }
 
 // Initial UI Fill

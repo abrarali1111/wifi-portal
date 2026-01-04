@@ -22,6 +22,7 @@ if (MONGODB_URI) {
         .catch(err => console.error('❌ MongoDB Error:', err));
 } else {
     console.log('📂 No MongoDB URI found. Running in LOCAL FILE MODE (db.json)');
+    console.warn('⚠️ WARNING: Data will NOT persist on Render.com in Local Mode! Please set MONGODB_URI in Environment Variables.');
     initializeLocalFile();
 }
 
