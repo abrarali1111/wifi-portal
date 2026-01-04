@@ -10,31 +10,19 @@
 
 <body>
 
-    <div class="container admin-container">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: 5px;">
-            <button id="logoutBtn" class="btn-primary"
-                style="width: auto; padding: 8px 15px; background-color: #dc2626; font-size: 0.9rem;">Logout</button>
-        </div>
+    <div class="container">
         <div class="dashboard-header">
-            <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                <h2 style="margin: 0;">RAJA SAB - Admin Dashboard</h2>
-                <p id="adminWelcomeName"
-                    style="color: var(--primary-color); font-weight: 600; font-size: 0.95rem; margin-top: 5px;">Welcome,
-                    Admin</p>
-            </div>
-            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button onclick="showSection('complaints')" class="btn-primary"
-                    style="width: auto; padding: 10px;">Complaints</button>
-                <button onclick="showSection('users')" class="btn-primary"
-                    style="width: auto; padding: 10px; background-color: #4b5563;">Users List</button>
-                <button onclick="showSection('reports')" class="btn-primary"
-                    style="width: auto; padding: 10px; background-color: #2563eb;">Monthly Reports</button>
-                <button id="addUserBtn" class="btn-primary"
-                    style="width: auto; padding: 10px; background-color: #059669;">+ Add User</button>
-                <button id="downloadExcelBtn" class="btn-primary"
-                    style="width: auto; padding: 10px; background-color: #d97706; border: 1px solid #b45309;">📥
-                    Download Excel</button>
-
+            <button id="logoutBtn" class="btn-primary" style="width: auto; padding: 10px 20px;">Logout</button>
+        </div>
+        <div class="dashboard-header" style="flex-direction: column; align-items: flex-start;">
+            <h2 style="font-family: 'Orbitron', sans-serif; letter-spacing: 1px;">Admin Dashboard</h2>
+            <p id="adminWelcomeName" style="color: var(--primary-color);">Welcome, Admin</p>
+            
+            <div class="btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; width: 100%;">
+                <button onclick="showSection('complaints')" class="btn-primary" style="flex: 1; min-width: 120px;">Complaints</button>
+                <button onclick="showSection('users')" class="btn-primary" style="flex: 1; min-width: 120px;">Users</button>
+                <button onclick="showSection('reports')" class="btn-primary" style="flex: 1; min-width: 120px;">Reports</button>
+                <button id="addUserBtn" class="btn-primary" style="flex: 1; min-width: 120px; background: var(--accent-color);">+ User</button>
             </div>
         </div>
 

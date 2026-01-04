@@ -34,51 +34,58 @@
 
 <body>
 
-    <div class="container admin-container"> <!-- Using wider container -->
-
+    <div class="container">
         <div class="dashboard-header">
-            <h2 id="welcomeMsg">Welcome to RAJA SAB WiFi</h2>
-            <a id="logoutBtn" class="logout-link">Logout</a>
+            <h2 id="welcomeMsg" style="font-family: 'Orbitron', sans-serif;">WiFi Dashboard</h2>
+            <button id="logoutBtn" class="btn-primary" style="width: auto; padding: 8px 15px;">Logout</button>
         </div>
 
         <!-- Profile Section -->
-        <div class="profile-card">
-            <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--primary-color);">My Profile</h3>
-            <p><strong>User ID:</strong> <span id="userCustomId"
-                    style="font-weight: bold; color: var(--primary-color);">...</span></p>
-            <p><strong>Name:</strong> <span id="userName">...</span></p>
-            <p><strong>CNIC:</strong> <span id="userCnic">...</span></p>
-            <p><strong>Phone:</strong> <span id="userPhone">...</span></p>
-            <p><strong>Email:</strong> <span id="userEmail">...</span></p>
-            <p><strong>Address:</strong> <span id="userAddress">...</span></p>
-
+        <div class="billing-card" style="margin-bottom: 25px;">
+            <h3
+                style="color: var(--primary-color); font-family: 'Orbitron', sans-serif; font-size: 0.9rem; margin-bottom: 15px;">
+                My Profile</h3>
+            <div style="display: flex; flex-direction: column; gap: 8px; font-size: 0.9rem;">
+                <p><strong>ID:</strong> <span id="userCustomId" style="color: var(--primary-color);">...</span></p>
+                <p><strong>Name:</strong> <span id="userName">...</span></p>
+                <p><strong>Phone:</strong> <span id="userPhone">...</span></p>
+                <p><strong>Address:</strong> <span id="userAddress">...</span></p>
+            </div>
         </div>
 
-        <!-- Subscription Details Section -->
-        <div class="profile-card" style="border-left: 4px solid var(--primary-color);">
-            <h3 style="margin-bottom: 10px; font-size: 1.1rem; color: var(--primary-color);">Subscription Details</h3>
-            <div class="profile-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <p><strong>Months:</strong> <span id="subPackage">Loading...</span></p>
-                <p><strong>Monthly Fee:</strong> <span id="subFee">Loading...</span></p>
-                <p><strong>Start Date:</strong> <span id="subStart">Loading...</span></p>
-                <p><strong>Next Due:</strong> <span id="subEnd">Loading...</span></p>
+        <!-- Subscription Section -->
+        <div class="billing-card" style="border-left: 4px solid var(--primary-color);">
+            <h4 style="margin-bottom: 15px;">Active Plan</h4>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <p style="font-size: 0.7rem; color: var(--text-light);">MONTHS</p>
+                    <p id="subPackage" style="font-weight: 600;">...</p>
+                </div>
+                <div>
+                    <p style="font-size: 0.7rem; color: var(--text-light);">MONTHLY FEE</p>
+                    <p id="subFee" style="font-weight: 600;">...</p>
+                </div>
+                <div>
+                    <p style="font-size: 0.7rem; color: var(--text-light);">NEXT DUE</p>
+                    <p id="subEnd" style="font-weight: 600;">...</p>
+                </div>
+                <div>
+                    <p style="font-size: 0.7rem; color: var(--text-light);">BALANCE</p>
+                    <p id="subBalance" style="font-weight: 600; color: var(--accent-color);">...</p>
+                </div>
             </div>
-            <hr style="margin: 10px 0; border: 0; border-top: 1px solid var(--border-color);">
-            <p style="font-size: 1.1rem;"><strong>Remaining Balance:</strong> <span id="subBalance"
-                    style="color: #ef4444; font-weight: bold;">Loading...</span></p>
         </div>
 
         <!-- Complaints Section -->
-        <div class="section-header" style="flex-wrap: wrap; gap: 10px;">
-            <h3>My Complaints / Messages</h3>
-            <button id="newComplaintBtn" class="btn-primary"
-                style="background-color: #059669; width: auto; padding: 12px 25px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-                + SUBMIT NEW COMPLAINT
-            </button>
-        </div>
-
-        <div id="myComplaintsList">
-            <p style="text-align: center; color: var(--text-light);">Loading your history...</p>
+        <div style="margin-top: 30px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3 style="font-size: 1rem;">Messages</h3>
+                <button id="newComplaintBtn" class="btn-primary"
+                    style="width: auto; padding: 8px 15px; font-size: 0.8rem;">+ New</button>
+            </div>
+            <div id="myComplaintsList">
+                <p style="text-align: center; color: var(--text-light);">Loading...</p>
+            </div>
         </div>
     </div>
 
