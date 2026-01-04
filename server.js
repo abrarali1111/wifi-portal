@@ -8,12 +8,18 @@ const PORT = process.env.PORT || 8000;
 const DB_FILE = path.join(__dirname, 'db.json');
 
 // --- DATABASE MODE DETECTION ---
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://abrar2211c_db_user:Wellcom3@cluster0.jjztyoi.mongodb.net/?retryWrites=true&w=majority";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://abrar2211c_db_user:Wellcom3@cluster0.jjztyoi.mongodb.net/wifi_db?retryWrites=true&w=majority";
 let IS_MONGO_MODE = false;
 
 if (MONGODB_URI) {
     console.log('📡 Attempting to connect to MongoDB...');
-    mongoose.connect(MONGODB_URI)
+    // Setting global mongoose options for stability
+    mongoose.set('strictQuery', false);
+
+    mongoose.connect(MONGODB_URI, {
+        serverSelectionTimeoutMS: 5000,
+        socketTimeoutMS: 45000,
+    })
         .then(() => {
             console.log('✅ Connected to MongoDB Atlas (Live Database)');
             IS_MONGO_MODE = true;
