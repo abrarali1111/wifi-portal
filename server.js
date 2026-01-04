@@ -271,17 +271,44 @@ const server = http.createServer(async (req, res) => {
         return;
     }
 
-    // Static Files
-    let filePath = path.join(__dirname, req.url === '/' ? 'index.html' : req.url);
+    // Static Files Handling
+    let urlPath = req.url.split('?')[0];
+    if (urlPath === '/') urlPath = '/index.html';
+
+    // Safety: prevent directory traversal
+    const safePath = path.normalize(urlPath).replace(/^(\.\.[\/\\])+/, '');
+    const filePath = path.join(__dirname, safePath);
+
     const extname = path.extname(filePath);
-    let contentType = 'text/html';
-    if (extname === '.js') contentType = 'text/javascript';
-    if (extname === '.css') contentType = 'text/css';
-    if (extname === '.json') contentType = 'application/json';
+    const mimeTypes = {
+        '.html': 'text/html',
+        '.js': 'text/javascript',
+        '.css': 'text/css',
+        '.json': 'application/json',
+        '.png': 'image/png',
+        '.jpg': 'image/jpg',
+        '.gif': 'image/gif',
+        '.svg': 'image/svg+xml',
+        '.wav': 'audio/wav',
+        '.mp4': 'video/mp4',
+        '.woff': 'application/font-woff',
+        '.ttf': 'application/font-ttf',
+        '.eot': 'application/vnd.ms-fontobject',
+        '.otf': 'application/font-otf',
+        '.wasm': 'application/wasm'
+    };
+
+    const contentType = mimeTypes[extname] || 'application/octet-stream';
 
     fs.readFile(filePath, (err, content) => {
         if (err) {
-            res.writeHead(404); res.end('File not found');
+            if (err.code === 'ENOENT') {
+                res.writeHead(404);
+                res.end('Not Found: ' + urlPath);
+            } else {
+                res.writeHead(500);
+                res.end('Server Error: ' + err.code);
+            }
         } else {
             res.writeHead(200, { 'Content-Type': contentType });
             res.end(content, 'utf-8');
