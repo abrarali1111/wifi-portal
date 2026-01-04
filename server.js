@@ -8,36 +8,33 @@ const PORT = process.env.PORT || 8000;
 const DB_FILE = path.join(__dirname, 'db.json');
 
 // --- DATABASE MODE DETECTION ---
-const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://abrar2211c_db_user:Wellcom3@cluster0.jjztyoi.mongodb.net/wifi_db?retryWrites=true&w=majority";
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://abrar2211c_db_user:Wellcom3@cluster0.jjztyoi.mongodb.net/?retryWrites=true&w=majority";
 let IS_MONGO_MODE = false;
 let cloudError = null;
 
-if (MONGODB_URI) {
-    console.log('📡 Attempting to connect to MongoDB...');
-    // Setting global mongoose options for stability
-    mongoose.set('strictQuery', false);
+async function startDB() {
+    if (MONGODB_URI) {
+        mongoose.set('strictQuery', false);
+        console.log('📡 Attempting to connect to MongoDB Atlas...');
 
-    mongoose.connect(MONGODB_URI, {
-        serverSelectionTimeoutMS: 5000,
-        socketTimeoutMS: 45000,
-    })
-        .then(() => {
+        try {
+            await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 8000 });
             console.log('✅ Connected to MongoDB Atlas (Live Database)');
             IS_MONGO_MODE = true;
             cloudError = null;
-            seedAdminMongo();
-        })
-        .catch(err => {
+            await seedAdminMongo();
+        } catch (err) {
             console.error('❌ MongoDB Connection Error:', err.message);
             cloudError = err.message;
-            console.log('📂 Falling back to LOCAL FILE MODE due to connection error');
+            console.log('📂 Falling back to LOCAL FILE MODE');
             initializeLocalFile();
-        });
-} else {
-    console.log('📂 No MongoDB URI found. Running in LOCAL FILE MODE (db.json)');
-    console.warn('⚠️ WARNING: Data will NOT persist on Render.com in Local Mode! Please set MONGODB_URI in Environment Variables.');
-    initializeLocalFile();
+        }
+    } else {
+        console.log('📂 No MongoDB URI found. Running in LOCAL FILE MODE (db.json)');
+        initializeLocalFile();
+    }
 }
+startDB();
 
 // --- MONGO SCHEMAS ---
 const userSchema = new mongoose.Schema({

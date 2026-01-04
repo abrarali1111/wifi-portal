@@ -61,11 +61,13 @@ async function loadServerData() {
             } else {
                 dbStatusEl.innerText = "⚠️ Temporary Mode (Local)";
                 if (data.cloudError) {
-                    console.error("Cloud Error:", data.cloudError);
-                    dbStatusEl.title = "Error: " + data.cloudError;
-                    // If it contains 'IP' it's likely a whitelisting issue
-                    if (data.cloudError.includes("IP")) {
+                    const err = data.cloudError.toLowerCase();
+                    if (err.includes("auth") || err.includes("password")) {
+                        dbStatusEl.innerText += " (Wrong Password)";
+                    } else if (err.includes("ip") || err.includes("whitelist")) {
                         dbStatusEl.innerText += " (IP Blocked)";
+                    } else {
+                        dbStatusEl.title = "Detailed Error: " + data.cloudError;
                     }
                 }
                 dbStatusEl.style.backgroundColor = "#b45309";
