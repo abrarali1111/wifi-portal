@@ -462,8 +462,8 @@ function updateBillingSummary(users) {
         totalRemainingBalance += balance;
     });
 
-    // Calculate total collected from payments record
-    const totalCollected = (window.allPayments || []).reduce((sum, p) => sum + (parseFloat(p.amount) || 0), 0);
+    // Calculate collected amount based on Monthly Fee vs Pending Balance
+    const totalCollected = Math.max(0, totalMonthlyFee - totalRemainingBalance);
 
     const feeEl = document.getElementById('totalMonthlyFee');
     const balanceEl = document.getElementById('totalRemainingBalance');
