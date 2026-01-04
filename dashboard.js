@@ -44,6 +44,10 @@ function updateUI(user) {
         if (el) el.innerText = val;
     };
 
+    const fee = parseFloat(user.monthlyFee) || 0;
+    const pending = parseFloat(user.balance) || 0;
+    const paid = Math.max(0, fee - pending);
+
     setE('welcomeMsg', `Hello, ${user.name}`);
     setE('userCustomId', user.customId || "Not Assigned");
     setE('userName', user.name);
@@ -51,19 +55,24 @@ function updateUI(user) {
     setE('userPhone', user.phone);
     setE('userEmail', user.email || "-");
     setE('subPackage', user.package || "-");
-    setE('subFee', user.monthlyFee ? user.monthlyFee + " PKR" : "0");
+    setE('subFee', fee + " PKR");
+    setE('subPaid', paid + " PKR");
+    setE('subBalance', pending + " PKR");
     setE('subStart', user.startDate || "-");
-    setE('subEnd', user.endDate || "-");
-    setE('subBalance', user.balance ? user.balance + " PKR" : "0");
+    setE('subAddress', user.address || "Not Added"); // Just in case
     setE('userAddress', user.address || "Not Added");
 
-    // Date Logic: If startDate exists, calculate End Date as +1 Month
+    // Date Logic: Exactly 1 month after startDate
     if (user.startDate && user.startDate !== "-" && user.startDate !== "") {
         try {
             const start = new Date(user.startDate);
-            start.setMonth(start.getMonth() + 1);
-            const end = start.toISOString().split('T')[0];
-            setE('subEnd', end);
+            if (!isNaN(start.getTime())) {
+                start.setMonth(start.getMonth() + 1);
+                const end = start.toISOString().split('T')[0];
+                setE('subEnd', end);
+            } else {
+                setE('subEnd', user.endDate || "-");
+            }
         } catch (e) {
             console.error("Date calc error:", e);
             setE('subEnd', user.endDate || "-");

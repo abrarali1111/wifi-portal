@@ -61,24 +61,25 @@
             <div class="billing-card" style="border-left-color: var(--accent-color);">
                 <h4>Active Subscription</h4>
                 <div
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; font-size: 0.9rem;">
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; font-size: 0.9rem;">
                     <div>
-                        <p style="color: var(--text-light); font-size: 0.7rem;">PACKAGE</p>
-                        <p id="subPackage">...</p>
-                    </div>
-                    <div>
-                        <p style="color: var(--text-light); font-size: 0.7rem;">MONTHLY FEE</p>
+                        <p style="color: var(--text-light); font-size: 0.7rem;">TOTAL (MONTHLY)</p>
                         <p id="subFee">...</p>
                     </div>
                     <div>
-                        <p style="color: var(--text-light); font-size: 0.7rem;">NEXT DUE</p>
-                        <p id="subEnd">...</p>
+                        <p style="color: var(--text-light); font-size: 0.7rem;">PAID BALANCE</p>
+                        <p id="subPaid" style="color: #4caf50; font-weight: bold;">...</p>
                     </div>
                     <div>
-                        <p style="color: var(--text-light); font-size: 0.7rem;">BALANCE</p>
+                        <p style="color: var(--text-light); font-size: 0.7rem;">PENDING (REMAINING)</p>
                         <p id="subBalance" style="color: var(--danger-color); font-weight: bold;">...</p>
                     </div>
+                    <div>
+                        <p style="color: var(--text-light); font-size: 0.7rem;">NEXT DUE / EXPIRE</p>
+                        <p id="subEnd" style="font-weight: bold;">...</p>
+                    </div>
                     <!-- Hidden for JS compatibility -->
+                    <span id="subPackage" style="display:none;"></span>
                     <span id="subStart" style="display:none;"></span>
                 </div>
             </div>
