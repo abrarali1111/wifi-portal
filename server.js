@@ -8,8 +8,8 @@ const PORT = process.env.PORT || 8000;
 const DB_FILE = path.join(__dirname, 'db.json');
 
 // --- DATABASE MODE DETECTION ---
-// If MONGODB_URI is present in env, we use MongoDB. Otherwise, we use Local File.
-const MONGODB_URI = process.env.MONGODB_URI;
+// Fallback to hardcoded URI for persistence if env variable is missing
+const MONGODB_URI = process.env.MONGODB_URI || "mongodb+srv://abrar2211c_db_user:Wellcom3@cluster0.jjztyoi.mongodb.net/wifi_db?retryWrites=true&w=majority";
 let IS_MONGO_MODE = false;
 
 if (MONGODB_URI) {
