@@ -10,31 +10,35 @@
 
 <body>
 
-    <div class="container">
+    <div class="container admin-container">
         <div class="dashboard-header">
-            <button id="logoutBtn" class="btn-primary" style="width: auto; padding: 10px 20px;">Logout</button>
-        </div>
-        <div class="dashboard-header" style="flex-direction: column; align-items: flex-start;">
-            <h2 style="font-family: 'Orbitron', sans-serif; letter-spacing: 1px;">Admin Dashboard</h2>
-            <p id="adminWelcomeName" style="color: var(--primary-color);">Welcome, Admin</p>
-            
-            <div class="btn-group" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; width: 100%;">
-                <button onclick="showSection('complaints')" class="btn-primary" style="flex: 1; min-width: 120px;">Complaints</button>
-                <button onclick="showSection('users')" class="btn-primary" style="flex: 1; min-width: 120px;">Users</button>
-                <button onclick="showSection('reports')" class="btn-primary" style="flex: 1; min-width: 120px;">Reports</button>
-                <button id="addUserBtn" class="btn-primary" style="flex: 1; min-width: 120px; background: var(--accent-color);">+ User</button>
+            <div>
+                <h1 style="color: var(--primary-color); text-align: left;">Admin Panel</h1>
+                <p id="adminWelcomeName">Welcome, Admin</p>
             </div>
+            <button id="logoutBtn" class="btn-primary"
+                style="width: auto; padding: 10px 20px; background: var(--danger-color);">Logout</button>
+        </div>
+
+        <div class="btn-group"
+            style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 30px;">
+            <button onclick="showSection('complaints')" class="btn-primary">Complaints</button>
+            <button onclick="showSection('users')" class="btn-primary" style="background: var(--border-color);">Users
+                List</button>
+            <button onclick="showSection('reports')" class="btn-primary"
+                style="background: var(--border-color);">Reports</button>
+            <button id="addUserBtn" class="btn-primary" style="background: var(--accent-color);">+ Add User</button>
         </div>
 
         <!-- Billing Summary Section -->
         <div class="billing-summary-container">
             <div class="billing-card">
-                <h4>Total Monthly Fee</h4>
+                <h4>Monthly Income</h4>
                 <div class="amount" id="totalMonthlyFee">Rs. 0</div>
             </div>
-            <div class="billing-card balance">
-                <h4>Total Remaining Balance</h4>
-                <div class="amount" id="totalRemainingBalance">Rs. 0</div>
+            <div class="billing-card" style="border-left-color: var(--danger-color);">
+                <h4>Pending Balance</h4>
+                <div class="amount" id="totalRemainingBalance" style="color: var(--danger-color);">Rs. 0</div>
             </div>
         </div>
 
