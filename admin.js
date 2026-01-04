@@ -284,6 +284,16 @@ function openEditModal(uid) {
     editModal.style.display = "block";
 }
 
+// Auto-calculate end date in edit modal when start date changes
+document.getElementById('editStart').addEventListener('change', (e) => {
+    const startVal = e.target.value;
+    if (startVal) {
+        const d = new Date(startVal);
+        d.setMonth(d.getMonth() + 1);
+        document.getElementById('editEnd').value = d.toISOString().split('T')[0];
+    }
+});
+
 // Handle Edit Submit
 document.getElementById('adminEditUserForm').addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -314,6 +324,9 @@ document.getElementById('adminEditUserForm').addEventListener('submit', async (e
             alert("User Details Updated!");
             editModal.style.display = "none";
             loadServerData();
+        } else {
+            const errData = await res.json();
+            alert("Failed to update: " + (errData.error || "Server Error"));
         }
     } catch (err) {
         alert("Error: " + err.message);

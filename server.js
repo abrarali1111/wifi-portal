@@ -118,7 +118,11 @@ async function createComplaint(compData) {
 
 async function updateUser(id, updates) {
     if (IS_MONGO_MODE) {
-        return await User.findOneAndUpdate({ id }, updates, { new: true });
+        let user = await User.findOneAndUpdate({ id }, updates, { new: true });
+        if (!user && mongoose.Types.ObjectId.isValid(id)) {
+            user = await User.findByIdAndUpdate(id, updates, { new: true });
+        }
+        return !!user;
     } else {
         const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
         const idx = data.users.findIndex(u => u.id === id);
@@ -133,7 +137,10 @@ async function updateUser(id, updates) {
 
 async function deleteUser(id) {
     if (IS_MONGO_MODE) {
-        const res = await User.deleteOne({ id });
+        let res = await User.deleteOne({ id });
+        if (res.deletedCount === 0 && mongoose.Types.ObjectId.isValid(id)) {
+            res = await User.deleteOne({ _id: id });
+        }
         return res.deletedCount > 0;
     } else {
         const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
