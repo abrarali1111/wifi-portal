@@ -113,10 +113,12 @@ function initializeLocalFile() {
 
 async function getAllData() {
     if (IS_MONGO_MODE) {
-        const u = await User.find({});
-        const c = await Complaint.find({});
-        const p = await Payment.find({});
-        const a = await Account.find({});
+        const [u, c, p, a] = await Promise.all([
+            User.find({}),
+            Complaint.find({}),
+            Payment.find({}),
+            Account.find({})
+        ]);
         return { users: u, complaints: c, payments: p, accounts: a };
     } else {
         return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));

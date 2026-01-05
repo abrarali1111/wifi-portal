@@ -22,16 +22,20 @@ async function refreshProfile() {
     try {
         const response = await fetch('/api/data');
         const data = await response.json();
+
         const serverUser = data.users.find(u => u.phone === currentUser.phone);
         if (serverUser) {
-            // Update local storage and UI
             localStorage.setItem("wifi_user", JSON.stringify(serverUser));
             updateUI(serverUser);
-        } else {
-            console.warn("User not found on server during refresh.");
         }
+
+        // Update other parts of dashboard with the SAME data we just got
+        renderMyComplaints(data.complaints || []);
+        renderMyPayments(data.payments || []);
+        renderAccountsUI(data.accounts || []);
+
     } catch (e) {
-        console.error("Profile refresh error:", e);
+        console.error("Dashboard refresh error:", e);
     }
 }
 
@@ -89,33 +93,34 @@ refreshProfile();
 // Periodically refresh profile and history
 setInterval(() => {
     refreshProfile();
-    loadMyComplaints();
-    loadAccounts();
-    loadMyPayments();
 }, 5000);
 
 // 3. FETCH USER'S COMPLAINTS
 async function loadMyComplaints() {
+    // Initial load only, thereafter it's handled by refreshProfile
+    refreshProfile();
+}
+
+function renderMyComplaints(allComplaints) {
     const listDiv = document.getElementById('myComplaintsList');
-    try {
-        const response = await fetch('/api/data');
-        const data = await response.json();
-        const myComplaints = data.complaints.filter(c => c.phone === currentUser.phone);
+    if (!listDiv) return;
 
-        listDiv.innerHTML = '';
-        if (myComplaints.length === 0) {
-            listDiv.innerHTML = '<p style="text-align: center; color: #888;">No messages found.</p>';
-            return;
-        }
+    const myComplaints = allComplaints.filter(c => c.phone === currentUser.phone);
 
-        // Sort desc
-        myComplaints.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    listDiv.innerHTML = '';
+    if (myComplaints.length === 0) {
+        listDiv.innerHTML = '<p style="text-align: center; color: #888;">No messages found.</p>';
+        return;
+    }
 
-        myComplaints.forEach(item => {
-            let dateString = new Date(item.timestamp).toLocaleString();
-            const card = document.createElement('div');
-            card.className = 'complaint-card';
-            card.innerHTML = `
+    // Sort desc
+    myComplaints.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    myComplaints.forEach(item => {
+        let dateString = new Date(item.timestamp).toLocaleString();
+        const card = document.createElement('div');
+        card.className = 'complaint-card';
+        card.innerHTML = `
                 <div class="complaint-header">
                     <span class="user-name">You</span>
                     <span class="timestamp">${dateString}</span>
@@ -133,98 +138,88 @@ async function loadMyComplaints() {
                     </div>
                 </div>
             `;
-            listDiv.appendChild(card);
-        });
+        listDiv.appendChild(card);
+    });
 
-        document.querySelectorAll('.delete-complaint-btn').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                if (confirm("Are you sure you want to delete this complaint?")) {
-                    const id = e.target.getAttribute('data-id');
-                    try {
-                        const res = await fetch('/api/complaints/delete', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ id })
-                        });
-                        if (res.ok) loadMyComplaints();
-                    } catch (err) { alert("Error deleting: " + err.message); }
-                }
-            });
+    document.querySelectorAll('.delete-complaint-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+            if (confirm("Are you sure you want to delete this complaint?")) {
+                const id = e.target.getAttribute('data-id');
+                try {
+                    const res = await fetch('/api/complaints/delete', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ id })
+                    });
+                    if (res.ok) loadMyComplaints();
+                } catch (err) { alert("Error deleting: " + err.message); }
+            }
         });
-    } catch (e) {
-        console.error("Error loading history:", e);
-        listDiv.innerHTML = '<p style="color:red">Error loading history.</p>';
-    }
+    });
 }
 
 loadMyComplaints();
 
 async function loadAccounts() {
+    // Initial load handled by refreshProfile
+}
+
+function renderAccountsUI(accounts) {
     const listDiv = document.getElementById('dynamicAccountsList');
     if (!listDiv) return;
 
-    try {
-        const response = await fetch('/api/data');
-        const data = await response.json();
-        const accounts = data.accounts || [];
+    if (accounts.length === 0) {
+        listDiv.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-light); text-align: center;">No payment methods available. Contact Admin.</p>';
+        return;
+    }
 
-        if (accounts.length === 0) {
-            listDiv.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-light); text-align: center;">No payment methods available. Contact Admin.</p>';
-            return;
-        }
+    listDiv.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px;">Please transfer the amount to one of the following accounts:</p>';
 
-        listDiv.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px;">Please transfer the amount to one of the following accounts:</p>';
-
-        accounts.forEach(acc => {
-            const accDiv = document.createElement('div');
-            accDiv.style.marginBottom = '10px';
-            accDiv.innerHTML = `
+    accounts.forEach(acc => {
+        const accDiv = document.createElement('div');
+        accDiv.style.marginBottom = '10px';
+        accDiv.innerHTML = `
                 <p><strong>${escapeHtml(acc.type)}:</strong><br>${escapeHtml(acc.details)} (${escapeHtml(acc.name)})</p>
             `;
-            listDiv.appendChild(accDiv);
-        });
-    } catch (e) {
-        console.error("Error loading accounts:", e);
-    }
+        listDiv.appendChild(accDiv);
+    });
 }
 
 loadAccounts();
 
 // 3.5 FETCH USER'S PAYMENTS
 async function loadMyPayments() {
+    // Initial load handled by refreshProfile or caller
+}
+
+function renderMyPayments(allPayments) {
     const body = document.getElementById('myPaymentHistoryBody');
     if (!body) return;
 
-    try {
-        const response = await fetch('/api/data');
-        const data = await response.json();
-        const myPayments = (data.payments || []).filter(p => p.userId === currentUser.id);
+    const myPayments = allPayments.filter(p => p.userId === currentUser.id);
 
-        body.innerHTML = '';
-        if (myPayments.length === 0) {
-            body.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888;">No payment records found.</td></tr>';
-            return;
-        }
+    body.innerHTML = '';
+    if (myPayments.length === 0) {
+        body.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888;">No payment records found.</td></tr>';
+        return;
+    }
 
-        // Sort by timestamp desc
-        myPayments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    // Sort by timestamp desc
+    myPayments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-        myPayments.forEach(p => {
-            const tr = document.createElement('tr');
-            let statusColor = "#94a3b8"; // Pending
-            if (p.status === 'approved') statusColor = "#10b981";
-            if (p.status === 'rejected') statusColor = "#ef4444";
+    myPayments.forEach(p => {
+        const tr = document.createElement('tr');
+        let statusColor = "#94a3b8"; // Pending
+        if (p.status === 'approved') statusColor = "#10b981";
+        if (p.status === 'rejected') statusColor = "#ef4444";
 
-            tr.innerHTML = `
+        tr.innerHTML = `
                 <td><strong>${escapeHtml(p.month)}</strong></td>
                 <td>Rs. ${p.amount.toLocaleString()}</td>
                 <td><span style="color: ${statusColor}; font-weight: 600; text-transform: capitalize;">${escapeHtml(p.status)}</span></td>
             `;
-            body.appendChild(tr);
-        });
-    } catch (e) {
-        console.error("Error loading payments:", e);
-    }
+        body.appendChild(tr);
+    });
 }
 
 loadMyPayments();
