@@ -461,7 +461,6 @@ function renderUsers(users) {
                 <td>${u.monthlyFee || '0'}</td>
                 <td style="color:red; font-weight:bold;">${u.balance || '0'}</td>
                 <td style="font-size: 0.8em;">${u.startDate || '-'}</td>
-                <td style="font-size: 0.8em;">${u.startDate || '-'}</td>
                 <td style="font-size: 0.8em;">${calculateEndDate(u.startDate) || u.endDate || '-'}</td>
                 <td>
                     <div style="display: flex; gap: 5px;">
