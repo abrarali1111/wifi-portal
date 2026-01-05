@@ -90,6 +90,7 @@ refreshProfile();
 setInterval(() => {
     refreshProfile();
     loadMyComplaints();
+    loadAccounts();
 }, 5000);
 
 // 3. FETCH USER'S COMPLAINTS
@@ -156,6 +157,37 @@ async function loadMyComplaints() {
 }
 
 loadMyComplaints();
+
+async function loadAccounts() {
+    const listDiv = document.getElementById('dynamicAccountsList');
+    if (!listDiv) return;
+
+    try {
+        const response = await fetch('/api/data');
+        const data = await response.json();
+        const accounts = data.accounts || [];
+
+        if (accounts.length === 0) {
+            listDiv.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-light); text-align: center;">No payment methods available. Contact Admin.</p>';
+            return;
+        }
+
+        listDiv.innerHTML = '<p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px;">Please transfer the amount to one of the following accounts:</p>';
+
+        accounts.forEach(acc => {
+            const accDiv = document.createElement('div');
+            accDiv.style.marginBottom = '10px';
+            accDiv.innerHTML = `
+                <p><strong>${escapeHtml(acc.type)}:</strong><br>${escapeHtml(acc.details)} (${escapeHtml(acc.name)})</p>
+            `;
+            listDiv.appendChild(accDiv);
+        });
+    } catch (e) {
+        console.error("Error loading accounts:", e);
+    }
+}
+
+loadAccounts();
 
 // 4. NEW COMPLAINT MODAL & LOGIC
 const modal = document.getElementById("complaintModal");

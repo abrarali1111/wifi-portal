@@ -32,6 +32,8 @@
                 List</button>
             <button onclick="showSection('reports')" class="btn-primary"
                 style="background: var(--border-color);">Reports</button>
+            <button onclick="showSection('settings')" class="btn-primary"
+                style="background: var(--border-color);">Settings</button>
             <button id="addUserBtn" class="btn-primary" style="background: var(--accent-color);">+ Add User</button>
         </div>
 
@@ -58,6 +60,33 @@
             <h3>Pending Payment Verifications</h3>
             <div id="pendingPaymentsList" style="margin-top: 15px;">
                 <p style="text-align: center; color: var(--text-light);">No pending verifications.</p>
+            </div>
+        </div>
+
+        <!-- Section: Settings -->
+        <div id="settingsSection" style="display: none;">
+            <h3>Payment Accounts / Bank Details</h3>
+            <div
+                style="background: var(--card-bg); padding: 20px; border-radius: 10px; border: 1px solid var(--border-color); margin-top: 15px;">
+                <form id="addAccountForm"
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; align-items: flex-end;">
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Account Type</label>
+                        <input type="text" id="accType" placeholder="EasyPaisa / Bank" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Account Name</label>
+                        <input type="text" id="accName" placeholder="A A Communication" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label>Details / Number</label>
+                        <input type="text" id="accDetails" placeholder="03XXXXXXXXX" required>
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: auto;">+ Add Account</button>
+                </form>
+            </div>
+            <div id="accountsList" style="margin-top: 20px;">
+                <!-- Populated by JS -->
             </div>
         </div>
 

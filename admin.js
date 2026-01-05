@@ -6,6 +6,7 @@ window.showSection = function (sectionId) {
     document.getElementById('usersSection').style.display = 'none';
     if (document.getElementById('reportsSection')) document.getElementById('reportsSection').style.display = 'none';
     if (document.getElementById('verificationSection')) document.getElementById('verificationSection').style.display = 'none';
+    if (document.getElementById('settingsSection')) document.getElementById('settingsSection').style.display = 'none';
 
     if (sectionId === 'complaints') {
         document.getElementById('complaintsSection').style.display = 'block';
@@ -16,6 +17,9 @@ window.showSection = function (sectionId) {
     } else if (sectionId === 'verification') {
         document.getElementById('verificationSection').style.display = 'block';
         renderPendingPayments();
+    } else if (sectionId === 'settings') {
+        document.getElementById('settingsSection').style.display = 'block';
+        renderAccounts();
     } else {
         document.getElementById('usersSection').style.display = 'block';
     }
@@ -80,6 +84,12 @@ async function loadServerData() {
 
         // Populate User Select in Payment Modal
         populatePaymentUserSelect(data.users || []);
+
+        // Store accounts globally
+        window.allAccounts = data.accounts || [];
+        if (document.getElementById('settingsSection') && document.getElementById('settingsSection').style.display === 'block') {
+            renderAccounts();
+        }
     } catch (e) {
         console.error("Error loading data:", e);
     }
@@ -847,6 +857,86 @@ window.rejectPayment = async function (pid) {
             setTimeout(renderPendingPayments, 500);
         }
     } catch (e) { alert("Error: " + e.message); }
+}
+
+// --- SETTINGS / ACCOUNTS MANAGEMENT ---
+function renderAccounts() {
+    const list = document.getElementById('accountsList');
+    if (!list) return;
+
+    list.innerHTML = '';
+    const accounts = window.allAccounts || [];
+
+    if (accounts.length === 0) {
+        list.innerHTML = '<p style="text-align: center; color: var(--text-light);">No accounts added.</p>';
+        return;
+    }
+
+    accounts.forEach(acc => {
+        const div = document.createElement('div');
+        div.className = 'complaint-card';
+        div.style.display = 'flex';
+        div.style.justifyContent = 'space-between';
+        div.style.alignItems = 'center';
+        div.innerHTML = `
+            <div>
+                <strong style="color: var(--primary-color);">${escapeHtml(acc.type)}</strong>: ${escapeHtml(acc.name)} 
+                <p style="font-size: 0.9rem; color: var(--text-light);">${escapeHtml(acc.details)}</p>
+            </div>
+            <button class="btn-delete" onclick="deleteAccount('${acc.id}')" style="width: auto;">Delete</button>
+        `;
+        list.appendChild(div);
+    });
+}
+
+// Global exposure for onclick
+window.deleteAccount = async function (id) {
+    if (!confirm("Are you sure you want to delete this account?")) return;
+    try {
+        const res = await fetch('/api/accounts/delete', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id })
+        });
+        if (res.ok) {
+            alert("Account deleted!");
+            loadServerData(); // Will refresh UI
+            setTimeout(renderAccounts, 500);
+        }
+    } catch (e) { alert("Error: " + e.message); }
+}
+
+if (document.getElementById('addAccountForm')) {
+    document.getElementById('addAccountForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        btn.innerText = "Adding...";
+        btn.disabled = true;
+
+        const type = document.getElementById('accType').value;
+        const name = document.getElementById('accName').value;
+        const details = document.getElementById('accDetails').value;
+
+        try {
+            const res = await fetch('/api/accounts/add', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ type, name, details })
+            });
+
+            if (res.ok) {
+                alert("Account Added!");
+                e.target.reset();
+                loadServerData();
+                setTimeout(renderAccounts, 500);
+            }
+        } catch (err) {
+            alert("Error: " + err.message);
+        } finally {
+            btn.innerText = "+ Add Account";
+            btn.disabled = false;
+        }
+    });
 }
 
 function calculateEndDate(startDate) {

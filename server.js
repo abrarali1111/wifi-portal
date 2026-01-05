@@ -57,9 +57,14 @@ const paymentSchema = new mongoose.Schema({
     timestamp: { type: Date, default: Date.now }
 });
 
+const accountSchema = new mongoose.Schema({
+    id: String, type: String, name: String, details: String, timestamp: { type: Date, default: Date.now }
+});
+
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 const Complaint = mongoose.models.Complaint || mongoose.model('Complaint', complaintSchema);
 const Payment = mongoose.models.Payment || mongoose.model('Payment', paymentSchema);
+const Account = mongoose.models.Account || mongoose.model('Account', accountSchema);
 
 // --- LOCAL FILE INIT ---
 function initializeLocalFile() {
@@ -67,7 +72,9 @@ function initializeLocalFile() {
     if (!fs.existsSync(DB_FILE)) {
         const initialData = {
             users: [{ id: "admin_seed", name: "abrar ali", phone: phone, password: "Wellcom3", role: 1, package: "Owner", balance: "0" }],
-            complaints: [], payments: []
+            complaints: [], payments: [], accounts: [
+                { id: "acc_1", type: "EasyPaisa", name: "A A Communication", details: "03XX-XXXXXXX" }
+            ]
         };
         fs.writeFileSync(DB_FILE, JSON.stringify(initialData, null, 2));
         console.log("📂 Local Database Created with Admin");
@@ -85,6 +92,10 @@ function initializeLocalFile() {
             fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
             console.log("👑 Local Admin Added");
         }
+        if (!data.accounts) {
+            data.accounts = [{ id: "acc_1", type: "EasyPaisa", name: "A A Communication", details: "03XX-XXXXXXX" }];
+            fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+        }
     }
 }
 
@@ -96,7 +107,8 @@ async function getAllData() {
         const u = await User.find({});
         const c = await Complaint.find({});
         const p = await Payment.find({});
-        return { users: u, complaints: c, payments: p };
+        const a = await Account.find({});
+        return { users: u, complaints: c, payments: p, accounts: a };
     } else {
         return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     }
@@ -355,6 +367,40 @@ const server = http.createServer(async (req, res) => {
                             data.payments[idx].status = 'rejected';
                             fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
                         }
+                    }
+                    res.end(JSON.stringify({ success: true }));
+                });
+                return;
+            }
+
+            if (route === '/api/accounts/add' && req.method === 'POST') {
+                let body = ''; req.on('data', c => body += c);
+                req.on('end', async () => {
+                    const accData = JSON.parse(body);
+                    accData.id = "acc_" + Date.now();
+                    if (IS_MONGO_MODE) {
+                        await Account.create(accData);
+                    } else {
+                        const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+                        if (!data.accounts) data.accounts = [];
+                        data.accounts.push(accData);
+                        fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+                    }
+                    res.writeHead(201); res.end(JSON.stringify({ success: true }));
+                });
+                return;
+            }
+
+            if (route === '/api/accounts/delete' && req.method === 'POST') {
+                let body = ''; req.on('data', c => body += c);
+                req.on('end', async () => {
+                    const { id } = JSON.parse(body);
+                    if (IS_MONGO_MODE) {
+                        await Account.deleteOne({ id });
+                    } else {
+                        const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+                        data.accounts = data.accounts.filter(a => a.id !== id);
+                        fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
                     }
                     res.end(JSON.stringify({ success: true }));
                 });
