@@ -26,6 +26,8 @@
         <div class="btn-group"
             style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 30px;">
             <button onclick="showSection('complaints')" class="btn-primary">Complaints</button>
+            <button onclick="showSection('verification')" class="btn-primary"
+                style="background: var(--accent-color);">Verifications</button>
             <button onclick="showSection('users')" class="btn-primary" style="background: var(--border-color);">Users
                 List</button>
             <button onclick="showSection('reports')" class="btn-primary"
@@ -50,6 +52,14 @@
         </div>
 
 
+
+        <!-- Section: Verification -->
+        <div id="verificationSection" style="display: none;">
+            <h3>Pending Payment Verifications</h3>
+            <div id="pendingPaymentsList" style="margin-top: 15px;">
+                <p style="text-align: center; color: var(--text-light);">No pending verifications.</p>
+            </div>
+        </div>
 
         <!-- Section: Complaints -->
         <div id="complaintsSection">
@@ -364,6 +374,20 @@
                 </div>
                 <button type="submit" class="btn-primary">Record Payment</button>
             </form>
+        </div>
+    </div>
+
+    <!-- The Modal: View Payment Proof -->
+    <div id="proofModal" class="modal">
+        <div class="modal-content" style="max-width: 600px;">
+            <span class="close" onclick="document.getElementById('proofModal').style.display='none'">&times;</span>
+            <div class="modal-header">
+                <h2>Payment Proof</h2>
+            </div>
+            <div style="text-align: center; margin-top: 15px;">
+                <img id="proofImage" src="" alt="Payment Slip"
+                    style="max-width: 100%; border-radius: 8px; border: 1px solid var(--border-color);">
+            </div>
         </div>
     </div>
 

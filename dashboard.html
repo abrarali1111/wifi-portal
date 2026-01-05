@@ -58,7 +58,12 @@
             </div>
 
             <div class="billing-card" style="border-left-color: var(--accent-color);">
-                <h4>Active Subscription</h4>
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <h4>Active Subscription</h4>
+                    <button id="payOnlineBtn" class="btn-primary"
+                        style="width: auto; padding: 5px 10px; font-size: 0.7rem; background: var(--accent-color);">Pay
+                        Online</button>
+                </div>
                 <div
                     style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 10px; font-size: 0.9rem;">
                     <div>
@@ -121,6 +126,56 @@
                     <textarea id="newMessageBody" required></textarea>
                 </div>
                 <button type="submit" class="btn-primary">Send Message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Pay Online Modal -->
+    <div id="paymentUploadModal" class="modal">
+        <div class="modal-content">
+            <span class="close" id="closePaymentModal">&times;</span>
+            <div class="modal-header">
+                <h2>Pay Online</h2>
+            </div>
+            <div
+                style="background: var(--input-bg); padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid var(--border-color);">
+                <p style="font-size: 0.8rem; color: var(--text-light); margin-bottom: 10px;">Please transfer the amount
+                    to one of the following accounts:</p>
+                <p><strong>EasyPaisa / JazzCash:</strong><br>03XX-XXXXXXX (A A Communication)</p>
+                <p style="margin-top: 10px;"><strong>Bank Account:</strong><br>HBL - 1234-5678-9012-34<br>Title: A A
+                    Communication</p>
+            </div>
+            <form id="submitPaymentForm">
+                <div class="form-group">
+                    <label>Amount Paid (PKR)</label>
+                    <input type="number" id="paySubmitAmount" required placeholder="E.g. 1500">
+                </div>
+                <div class="form-group">
+                    <label>Billing Month</label>
+                    <select id="paySubmitMonth" required>
+                        <option value="Jan">January</option>
+                        <option value="Feb">February</option>
+                        <option value="Mar">March</option>
+                        <option value="Apr">April</option>
+                        <option value="May">May</option>
+                        <option value="Jun">June</option>
+                        <option value="Jul">July</option>
+                        <option value="Aug">August</option>
+                        <option value="Sep">September</option>
+                        <option value="Oct">October</option>
+                        <option value="Nov">November</option>
+                        <option value="Dec">December</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Transaction ID / Ref #</label>
+                    <input type="text" id="paySubmitTxId" placeholder="E.g. 123456789">
+                </div>
+                <div class="form-group">
+                    <label>Upload Payment Slip (Screenshot)</label>
+                    <input type="file" id="paySubmitSlip" accept="image/*" required style="padding: 5px;">
+                </div>
+                <button type="submit" class="btn-primary">Submit for Approval</button>
             </form>
         </div>
     </div>

@@ -46,7 +46,15 @@ const complaintSchema = new mongoose.Schema({
     id: String, name: String, phone: String, email: String, type: String, message: String, adminReply: String, timestamp: { type: Date, default: Date.now }, replyTimestamp: Date
 });
 const paymentSchema = new mongoose.Schema({
-    id: String, userId: String, userName: String, amount: Number, month: String, timestamp: { type: Date, default: Date.now }
+    id: String,
+    userId: String,
+    userName: String,
+    amount: Number,
+    month: String,
+    transactionId: String, // Added for online payments
+    proof: String, // Base64 image
+    status: { type: String, default: 'approved' }, // 'pending', 'approved', 'rejected'
+    timestamp: { type: Date, default: Date.now }
 });
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
@@ -280,12 +288,86 @@ const server = http.createServer(async (req, res) => {
                 return;
             }
 
+            if (route === '/api/payments/submit-proof' && req.method === 'POST') {
+                let body = ''; req.on('data', c => body += c);
+                req.on('end', async () => {
+                    const pData = JSON.parse(body);
+                    pData.id = "pay_" + Date.now();
+                    pData.timestamp = new Date().toISOString();
+                    pData.status = 'pending'; // Requires admin approval
+
+                    if (IS_MONGO_MODE) {
+                        await Payment.create(pData);
+                    } else {
+                        const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+                        if (!data.payments) data.payments = [];
+                        data.payments.push(pData);
+                        fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+                    }
+                    res.writeHead(201); res.end(JSON.stringify({ success: true }));
+                });
+                return;
+            }
+
+            if (route === '/api/payments/approve' && req.method === 'POST') {
+                let body = ''; req.on('data', c => body += c);
+                req.on('end', async () => {
+                    const { id } = JSON.parse(body);
+                    if (IS_MONGO_MODE) {
+                        const pay = await Payment.findOne({ id });
+                        if (pay && pay.status === 'pending') {
+                            pay.status = 'approved';
+                            await pay.save();
+                            // Update User Balance
+                            const user = await User.findOne({ id: pay.userId });
+                            if (user) {
+                                user.balance = (parseFloat(user.balance || 0) - parseFloat(pay.amount)).toString();
+                                await user.save();
+                            }
+                        }
+                    } else {
+                        const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+                        const idx = data.payments.findIndex(p => p.id === id);
+                        if (idx !== -1 && data.payments[idx].status === 'pending') {
+                            data.payments[idx].status = 'approved';
+                            const uIdx = data.users.findIndex(u => u.id === data.payments[idx].userId);
+                            if (uIdx !== -1) {
+                                data.users[uIdx].balance = (parseFloat(data.users[uIdx].balance || 0) - parseFloat(data.payments[idx].amount)).toString();
+                            }
+                            fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+                        }
+                    }
+                    res.end(JSON.stringify({ success: true }));
+                });
+                return;
+            }
+
+            if (route === '/api/payments/reject' && req.method === 'POST') {
+                let body = ''; req.on('data', c => body += c);
+                req.on('end', async () => {
+                    const { id } = JSON.parse(body);
+                    if (IS_MONGO_MODE) {
+                        await Payment.findOneAndUpdate({ id }, { status: 'rejected' });
+                    } else {
+                        const data = JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+                        const idx = data.payments.findIndex(p => p.id === id);
+                        if (idx !== -1) {
+                            data.payments[idx].status = 'rejected';
+                            fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+                        }
+                    }
+                    res.end(JSON.stringify({ success: true }));
+                });
+                return;
+            }
+
             if (route === '/api/payments/add' && req.method === 'POST') {
                 let body = ''; req.on('data', c => body += c);
                 req.on('end', async () => {
                     const pData = JSON.parse(body);
                     pData.id = "pay_" + Date.now();
                     pData.timestamp = new Date().toISOString();
+                    pData.status = 'approved'; // Manual admin entry is always approved
 
                     if (IS_MONGO_MODE) {
                         await Payment.create(pData);
@@ -294,11 +376,11 @@ const server = http.createServer(async (req, res) => {
                         if (!user && mongoose.Types.ObjectId.isValid(pData.userId)) {
                             const u2 = await User.findById(pData.userId);
                             if (u2) {
-                                u2.balance = (parseFloat(u2.balance) - parseFloat(pData.amount)).toString();
+                                u2.balance = (parseFloat(u2.balance || 0) - parseFloat(pData.amount)).toString();
                                 await u2.save();
                             }
                         } else if (user) {
-                            user.balance = (parseFloat(user.balance) - parseFloat(pData.amount)).toString();
+                            user.balance = (parseFloat(user.balance || 0) - parseFloat(pData.amount)).toString();
                             await user.save();
                         }
                     } else {

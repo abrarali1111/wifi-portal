@@ -206,6 +206,70 @@ if (form) {
     });
 }
 
+// 5. ONLINE PAYMENT MODAL LOGIC
+const payModal = document.getElementById("paymentUploadModal");
+const payBtn = document.getElementById("payOnlineBtn");
+const closePay = document.getElementById("closePaymentModal");
+const payForm = document.getElementById("submitPaymentForm");
+
+if (payBtn) payBtn.onclick = () => payModal.style.display = "block";
+if (closePay) closePay.onclick = () => payModal.style.display = "none";
+
+if (payForm) {
+    payForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btnSubmit = payForm.querySelector('button');
+        btnSubmit.innerText = "Submitting...";
+        btnSubmit.disabled = true;
+
+        const amount = document.getElementById('paySubmitAmount').value;
+        const month = document.getElementById('paySubmitMonth').value;
+        const txId = document.getElementById('paySubmitTxId').value;
+        const fileInput = document.getElementById('paySubmitSlip');
+
+        let base64File = null;
+        if (fileInput.files.length > 0) {
+            const file = fileInput.files[0];
+            base64File = await toBase64(file);
+        }
+
+        try {
+            const res = await fetch('/api/payments/submit-proof', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: currentUser.id,
+                    userName: currentUser.name,
+                    amount: parseFloat(amount),
+                    month: month + " " + new Date().getFullYear(),
+                    transactionId: txId,
+                    proof: base64File
+                })
+            });
+
+            if (res.ok) {
+                alert("Payment proof submitted! Admin will verify it soon.");
+                payModal.style.display = "none";
+                payForm.reset();
+            } else {
+                alert("Submission failed.");
+            }
+        } catch (e) {
+            alert("Error: " + e.message);
+        } finally {
+            btnSubmit.innerText = "Submit for Approval";
+            btnSubmit.disabled = false;
+        }
+    });
+}
+
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});
+
 function escapeHtml(text) {
     if (!text) return "";
     return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");

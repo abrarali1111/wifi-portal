@@ -5,14 +5,17 @@ window.showSection = function (sectionId) {
     document.getElementById('complaintsSection').style.display = 'none';
     document.getElementById('usersSection').style.display = 'none';
     if (document.getElementById('reportsSection')) document.getElementById('reportsSection').style.display = 'none';
+    if (document.getElementById('verificationSection')) document.getElementById('verificationSection').style.display = 'none';
 
     if (sectionId === 'complaints') {
         document.getElementById('complaintsSection').style.display = 'block';
     } else if (sectionId === 'reports') {
         document.getElementById('reportsSection').style.display = 'block';
         renderReports();
-        // Initialize Custom Report controls if any
         setupReportControls();
+    } else if (sectionId === 'verification') {
+        document.getElementById('verificationSection').style.display = 'block';
+        renderPendingPayments();
     } else {
         document.getElementById('usersSection').style.display = 'block';
     }
@@ -765,6 +768,85 @@ function downloadReport() {
     link.href = url;
     link.download = `billing_report_${new Date().toDateString()}.csv`;
     link.click();
+}
+
+function renderPendingPayments() {
+    const list = document.getElementById('pendingPaymentsList');
+    if (!list) return;
+
+    const payments = (window.allPayments || []).filter(p => p.status === 'pending');
+    list.innerHTML = '';
+
+    if (payments.length === 0) {
+        list.innerHTML = '<p style="text-align: center; color: var(--text-light);">No pending verifications.</p>';
+        return;
+    }
+
+    payments.forEach(p => {
+        const div = document.createElement('div');
+        div.className = 'complaint-card'; // Reuse styling
+        div.innerHTML = `
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4 style="color: var(--primary-color);">${escapeHtml(p.userName)}</h4>
+                    <p style="font-size: 0.9rem;"><strong>Amount:</strong> Rs. ${p.amount}</p>
+                    <p style="font-size: 0.9rem;"><strong>Month:</strong> ${p.month}</p>
+                    <p style="font-size: 0.9rem;"><strong>Tx ID:</strong> ${p.transactionId || 'N/A'}</p>
+                </div>
+                <div style="text-align: right;">
+                    <span style="font-size: 0.75rem; color: var(--text-light);">${new Date(p.timestamp).toLocaleString()}</span>
+                    <div style="margin-top: 10px; display: flex; gap: 8px;">
+                        <button class="btn-primary" onclick="viewProof('${p.id}')" style="width: auto; padding: 4px 10px; font-size: 0.75rem; background: var(--border-color);">View Slip</button>
+                        <button class="btn-primary" onclick="approvePayment('${p.id}')" style="width: auto; padding: 4px 10px; font-size: 0.75rem; background: var(--accent-color);">Approve</button>
+                        <button class="btn-delete" onclick="rejectPayment('${p.id}')" style="width: auto; padding: 4px 10px; font-size: 0.75rem;">Reject</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        list.appendChild(div);
+    });
+}
+
+window.viewProof = function (pid) {
+    const pay = window.allPayments.find(p => p.id === pid);
+    if (!pay || !pay.proof) {
+        alert("No proof image found.");
+        return;
+    }
+    document.getElementById('proofImage').src = pay.proof;
+    document.getElementById('proofModal').style.display = 'block';
+}
+
+window.approvePayment = async function (pid) {
+    if (!confirm("Are you sure you want to approve this payment?")) return;
+    try {
+        const res = await fetch('/api/payments/approve', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: pid })
+        });
+        if (res.ok) {
+            alert("Payment Approved!");
+            loadServerData();
+            setTimeout(renderPendingPayments, 500);
+        }
+    } catch (e) { alert("Error: " + e.message); }
+}
+
+window.rejectPayment = async function (pid) {
+    if (!confirm("Are you sure you want to reject this payment?")) return;
+    try {
+        const res = await fetch('/api/payments/reject', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: pid })
+        });
+        if (res.ok) {
+            alert("Payment Rejected.");
+            loadServerData();
+            setTimeout(renderPendingPayments, 500);
+        }
+    } catch (e) { alert("Error: " + e.message); }
 }
 
 function calculateEndDate(startDate) {
