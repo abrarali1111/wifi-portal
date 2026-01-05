@@ -289,4 +289,14 @@ button.btn-primary:hover {
     header h1 {
         font-size: 1.5rem;
     }
+
+    #reportsSection button,
+    #reportsSection select,
+    #reportsSection input {
+        width: 100% !important;
+    }
+
+    #reportsSection .btn-primary {
+        margin-top: 10px;
+    }
 }
