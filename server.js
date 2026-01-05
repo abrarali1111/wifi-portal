@@ -18,14 +18,23 @@ async function startDB() {
         console.log('📡 Attempting to connect to MongoDB Atlas...');
 
         try {
-            await mongoose.connect(MONGODB_URI, { serverSelectionTimeoutMS: 8000 });
+            await mongoose.connect(MONGODB_URI, {
+                serverSelectionTimeoutMS: 5000,
+                family: 4
+            });
             console.log('✅ Connected to MongoDB Atlas (Live Database)');
             IS_MONGO_MODE = true;
             cloudError = null;
             await seedAdminMongo();
         } catch (err) {
             console.error('❌ MongoDB Connection Error:', err.message);
-            cloudError = err.message;
+            if (err.message.includes("selection timeout") || err.message.includes("ETIMEDOUT")) {
+                cloudError = "IP Not Whitelisted / Network Issue";
+            } else if (err.message.includes("auth") || err.message.includes("Authentication")) {
+                cloudError = "Database Auth Failed";
+            } else {
+                cloudError = err.message;
+            }
             console.log('📂 Falling back to LOCAL FILE MODE');
             initializeLocalFile();
         }
