@@ -20,10 +20,10 @@ if (currentUser.role !== 2) {
 // 2. REFRESH PROFILE FROM SERVER
 async function refreshProfile() {
     try {
-        const response = await fetch('/api/data');
+        const response = await fetch(`/api/user-data?phone=${currentUser.phone}`);
         const data = await response.json();
 
-        const serverUser = data.users.find(u => u.phone === currentUser.phone);
+        const serverUser = data.user;
         if (serverUser) {
             localStorage.setItem("wifi_user", JSON.stringify(serverUser));
             updateUI(serverUser);

@@ -211,6 +211,33 @@ const server = http.createServer(async (req, res) => {
                 return;
             }
 
+            if (route === '/api/user-data' && req.method === 'GET') {
+                const query = new URL(req.url, `http://${req.headers.host}`).searchParams;
+                const phone = query.get('phone');
+                if (!phone) {
+                    res.writeHead(400); res.end(JSON.stringify({ error: "Missing phone" })); return;
+                }
+
+                const data = await getAllData();
+                const user = data.users.find(u => u.phone === phone);
+                if (!user) {
+                    res.writeHead(404); res.end(JSON.stringify({ error: "User not found" })); return;
+                }
+
+                const userSpecificData = {
+                    user: user,
+                    complaints: data.complaints.filter(c => c.phone === phone),
+                    payments: data.payments.filter(p => p.userId === user.id),
+                    accounts: data.accounts,
+                    isCloud: IS_MONGO_MODE,
+                    cloudError: cloudError
+                };
+
+                res.writeHead(200, { 'Content-Type': 'application/json' });
+                res.end(JSON.stringify(userSpecificData));
+                return;
+            }
+
             if (route === '/api/login' && req.method === 'POST') {
                 let body = ''; req.on('data', c => body += c);
                 req.on('end', async () => {
