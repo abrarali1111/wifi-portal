@@ -40,7 +40,7 @@ startDB();
 const userSchema = new mongoose.Schema({
     id: String, customId: String, name: String, phone: String, password: { type: String, default: "123" },
     cnic: String, address: String, email: String, role: { type: Number, default: 2 },
-    package: String, monthlyFee: String, balance: String, startDate: String, endDate: String, note: String, createdAt: { type: Date, default: Date.now }
+    package: String, monthlyFee: String, balance: String, startDate: String, endDate: String, profilePic: String, note: String, createdAt: { type: Date, default: Date.now }
 });
 const complaintSchema = new mongoose.Schema({
     id: String, name: String, phone: String, email: String, type: String, message: String, adminReply: String, timestamp: { type: Date, default: Date.now }, replyTimestamp: Date

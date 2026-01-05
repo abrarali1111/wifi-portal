@@ -20,6 +20,12 @@ if (registerForm) {
         const password = document.getElementById('regPassword').value;
         const email = document.getElementById('regEmail').value;
         const address = document.getElementById('regAddress').value;
+        const profilePicInput = document.getElementById('regProfilePic');
+
+        let profilePicBase64 = "";
+        if (profilePicInput && profilePicInput.files[0]) {
+            profilePicBase64 = await toBase64(profilePicInput.files[0]);
+        }
 
         try {
             const userObj = {
@@ -29,6 +35,7 @@ if (registerForm) {
                 password: password,
                 email: email,
                 address: address,
+                profilePic: profilePicBase64,
                 package: "Not Assigned",
                 role: 2, // User role is 2
                 monthlyFee: "0",
@@ -126,3 +133,10 @@ if (logoutBtn) {
         }
     });
 }
+
+const toBase64 = file => new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = error => reject(error);
+});

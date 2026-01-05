@@ -437,11 +437,12 @@ function renderUsers(users) {
 
     // Render Admins
     if (admins.length === 0) {
-        adminTableBody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No administrators found</td></tr>';
+        adminTableBody.innerHTML = '<tr><td colspan="7" style="text-align: center;">No administrators found</td></tr>';
     } else {
         admins.forEach(u => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
+                <td><img src="${u.profilePic || 'https://via.placeholder.com/30?text=A'}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;"></td>
                 <td>${escapeHtml(u.name)}</td>
                 <td>${u.phone}</td>
                 <td style="font-size: 0.8em;">${u.cnic || '-'}</td>
@@ -460,12 +461,13 @@ function renderUsers(users) {
 
     // Render Customers
     if (customers.length === 0) {
-        userTableBody.innerHTML = '<tr><td colspan="11" style="text-align: center;">No customers found</td></tr>';
+        userTableBody.innerHTML = '<tr><td colspan="12" style="text-align: center;">No customers found</td></tr>';
     } else {
         customers.forEach(u => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
                 <td><strong>${escapeHtml(u.customId || '-')}</strong></td>
+                <td><img src="${u.profilePic || 'https://via.placeholder.com/30?text=U'}" style="width:30px; height:30px; border-radius:50%; object-fit:cover;"></td>
                 <td>${escapeHtml(u.name)}</td>
                 <td>${u.phone}</td>
                 <td style="font-size: 0.8em;">${u.cnic || '-'}</td>
