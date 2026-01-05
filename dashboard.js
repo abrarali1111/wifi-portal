@@ -62,11 +62,6 @@ function updateUI(user) {
     setE('subAddress', user.address || "Not Added"); // Just in case
     setE('userAddress', user.address || "Not Added");
 
-    if (user.profilePic) {
-        const picEl = document.getElementById('displayProfilePic');
-        if (picEl) picEl.src = user.profilePic;
-    }
-
     // Date Logic: Exactly 1 month after startDate
     if (user.startDate && user.startDate !== "-" && user.startDate !== "") {
         try {
