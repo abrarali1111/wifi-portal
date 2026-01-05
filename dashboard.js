@@ -96,6 +96,7 @@ setInterval(() => {
     refreshProfile();
     loadMyComplaints();
     loadAccounts();
+    loadMyPayments();
 }, 5000);
 
 // 3. FETCH USER'S COMPLAINTS
@@ -194,6 +195,45 @@ async function loadAccounts() {
 
 loadAccounts();
 
+// 3.5 FETCH USER'S PAYMENTS
+async function loadMyPayments() {
+    const body = document.getElementById('myPaymentHistoryBody');
+    if (!body) return;
+
+    try {
+        const response = await fetch('/api/data');
+        const data = await response.json();
+        const myPayments = (data.payments || []).filter(p => p.userId === currentUser.id);
+
+        body.innerHTML = '';
+        if (myPayments.length === 0) {
+            body.innerHTML = '<tr><td colspan="3" style="text-align: center; color: #888;">No payment records found.</td></tr>';
+            return;
+        }
+
+        // Sort by timestamp desc
+        myPayments.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+        myPayments.forEach(p => {
+            const tr = document.createElement('tr');
+            let statusColor = "#94a3b8"; // Pending
+            if (p.status === 'approved') statusColor = "#10b981";
+            if (p.status === 'rejected') statusColor = "#ef4444";
+
+            tr.innerHTML = `
+                <td><strong>${escapeHtml(p.month)}</strong></td>
+                <td>Rs. ${p.amount.toLocaleString()}</td>
+                <td><span style="color: ${statusColor}; font-weight: 600; text-transform: capitalize;">${escapeHtml(p.status)}</span></td>
+            `;
+            body.appendChild(tr);
+        });
+    } catch (e) {
+        console.error("Error loading payments:", e);
+    }
+}
+
+loadMyPayments();
+
 // 4. NEW COMPLAINT MODAL & LOGIC
 const modal = document.getElementById("complaintModal");
 const btn = document.getElementById("newComplaintBtn");
@@ -270,6 +310,25 @@ if (payForm) {
             base64File = await toBase64(file);
         }
 
+        const currentFee = parseFloat(currentUser.monthlyFee) || 0;
+        if (parseFloat(amount) > currentFee) {
+            alert(`Caution: Your monthly fee is Rs. ${currentFee}. Please pay for one month at a time. If you want to pay for the next month, submit a separate payment selecting that month.`);
+            btnSubmit.innerText = "Submit for Approval";
+            btnSubmit.disabled = false;
+            return;
+        }
+
+        // Year Logic: If we are in Dec and user selects Jan/Feb, it's likely next year
+        const now = new Date();
+        let targetYear = now.getFullYear();
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        const selectedMonthIdx = monthNames.indexOf(month);
+        const currentMonthIdx = now.getMonth();
+
+        if (selectedMonthIdx < currentMonthIdx - 6) { // E.g. Dec (11) to Jan (0)
+            targetYear++;
+        }
+
         try {
             const res = await fetch('/api/payments/submit-proof', {
                 method: 'POST',
@@ -278,7 +337,7 @@ if (payForm) {
                     userId: currentUser.id,
                     userName: currentUser.name,
                     amount: parseFloat(amount),
-                    month: month + " " + new Date().getFullYear(),
+                    month: month + " " + targetYear,
                     transactionId: txId,
                     proof: base64File
                 })
@@ -288,6 +347,7 @@ if (payForm) {
                 alert("Payment proof submitted! Admin will verify it soon.");
                 payModal.style.display = "none";
                 payForm.reset();
+                loadMyPayments();
             } else {
                 alert("Submission failed.");
             }
