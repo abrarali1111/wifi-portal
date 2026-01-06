@@ -7,6 +7,7 @@ if (!storedUser) {
 }
 
 const currentUser = JSON.parse(storedUser);
+let userPayments = []; // Global to store for validation
 
 // ROLE PROTECTION: Only Role 2 (User) can access this page
 if (currentUser.role !== 2) {
@@ -30,6 +31,7 @@ async function refreshProfile() {
         }
 
         // Update other parts of dashboard with the SAME data we just got
+        userPayments = data.payments || [];
         renderMyComplaints(data.complaints || []);
         renderMyPayments(data.payments || []);
         renderAccountsUI(data.accounts || []);
@@ -300,14 +302,6 @@ if (payForm) {
             base64File = await toBase64(file);
         }
 
-        const currentFee = parseFloat(currentUser.monthlyFee) || 0;
-        if (parseFloat(amount) > currentFee) {
-            alert(`Caution: Your monthly fee is Rs. ${currentFee}. Please pay for one month at a time. If you want to pay for the next month, submit a separate payment selecting that month.`);
-            btnSubmit.innerText = "Submit for Approval";
-            btnSubmit.disabled = false;
-            return;
-        }
-
         // Year Logic: If we are in Dec and user selects Jan/Feb, it's likely next year
         const now = new Date();
         let targetYear = now.getFullYear();
@@ -319,6 +313,26 @@ if (payForm) {
             targetYear++;
         }
 
+        const selectedMonthFull = month + " " + targetYear;
+        const currentFee = parseFloat(currentUser.monthlyFee) || 0;
+
+        // Validation: Sum of approved/pending for this month
+        const alreadyPaidForMonth = userPayments
+            .filter(p => p.month === selectedMonthFull && p.status !== 'rejected')
+            .reduce((sum, p) => sum + (p.amount || 0), 0);
+
+        if (alreadyPaidForMonth + parseFloat(amount) > currentFee) {
+            const remaining = currentFee - alreadyPaidForMonth;
+            if (remaining <= 0) {
+                alert(`You have already paid/submitted the full fee (Rs. ${currentFee}) for ${selectedMonthFull}.`);
+            } else {
+                alert(`Your remaining fee for ${selectedMonthFull} is Rs. ${remaining}. You cannot pay more than this for this month.`);
+            }
+            btnSubmit.innerText = "Submit for Approval";
+            btnSubmit.disabled = false;
+            return;
+        }
+
         try {
             const res = await fetch('/api/payments/submit-proof', {
                 method: 'POST',
@@ -327,7 +341,7 @@ if (payForm) {
                     userId: currentUser.id,
                     userName: currentUser.name,
                     amount: parseFloat(amount),
-                    month: month + " " + targetYear,
+                    month: selectedMonthFull,
                     transactionId: txId,
                     proof: base64File
                 })
